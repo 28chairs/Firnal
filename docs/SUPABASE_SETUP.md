@@ -30,10 +30,16 @@ Complete these steps in the [Supabase Dashboard](https://supabase.com/dashboard)
 
 ## 5. Run migration (Phase 1)
 
-After Phase 1 creates `supabase/migrations/001_init.sql`, run it via:
+Run the SQL in [`supabase/migrations/001_init.sql`](../supabase/migrations/001_init.sql):
 
-- Supabase Dashboard → **SQL Editor** → paste and run, or
+- Supabase Dashboard → **SQL Editor** → paste full file → **Run**, or
 - Supabase CLI: `supabase db push`
+
+This creates `profiles`, `voice_entries`, `daily_journals`, `habits`, `habit_completions`, RLS policies, and the signup trigger.
+
+## 6. Run storage migration (Phase 2)
+
+Run [`supabase/migrations/002_storage.sql`](../supabase/migrations/002_storage.sql) to create the private `voice-audio` bucket for recording retries.
 
 ---
 

@@ -1,7 +1,7 @@
 # Product Requirements Document (PRD)
 # FIRNAL — Voice-First AI Journaling App
 
-**Version:** 2.3  
+**Version:** 2.4  
 **Date:** September 6, 2026  
 **Status:** Draft — Ready for implementation  
 **Author:** Product / Engineering  
@@ -35,7 +35,7 @@
 
 **Appendices**
 - [Appendix A: Glossary](#appendix-a-glossary)
-- [Appendix B: Build Plan Master Index (79 Steps)](#appendix-b-build-plan-master-index-79-steps)
+- [Appendix B: Build Plan Master Index](#appendix-b-build-plan-master-index)
 
 ---
 
@@ -55,7 +55,7 @@ The core value proposition: **record your day in seconds; read a structured, vis
 |----------|--------|
 | Platform | Web PWA (desktop + mobile browser) |
 | Capture model | Multiple voice captures per day → one merged daily flowchart |
-| Authentication | Email magic-link sign-in, cloud-synced data |
+| Authentication | **Phase 9** — email magic-link + cloud sync (Phases 0–8: no sign-in wall; data in localStorage) |
 | Navigation | 4 tabs + center record button: Home, Calendar, Habits, Profile |
 | Home breakdown | Whole-day merged flowchart (5 AI categories + connector lines) |
 | Habits | AI auto-check when mentioned in voice + manual toggle on Habits tab |
@@ -145,9 +145,9 @@ Make daily reflection effortless so people actually keep a journal — and can l
 
 ## 5. Scope Definition
 
-### In Scope (MVP)
+### In Scope (MVP — Phases 0–7, no sign-in)
 
-1. Email magic-link authentication
+1. **Local-first data** — voice captures in `localStorage` until Phase 9
 2. **Center FAB record button** — hold-to-record from any tab (opens recording overlay)
 3. Multiple voice captures per day
 4. Speech-to-text transcription (OpenAI Whisper)
@@ -155,7 +155,7 @@ Make daily reflection effortless so people actually keep a journal — and can l
 6. **Home tab** — day flowchart, recent recordings, habit reminders, Google Calendar events (read)
 7. **Calendar tab** — month view archive of journaled days
 8. **Habits tab** — create daily habits, AI auto-complete from voice, manual toggle
-9. **Profile tab** — Google Calendar connect (read), account, timezone, sign out
+9. **Profile tab** — Google Calendar connect (read), timezone, account settings *(sign-in → Phase 9)*
 10. Full-text search (from Home header)
 11. PWA installability
 12. Timezone-aware day grouping
@@ -221,13 +221,13 @@ Search is **not a bottom tab**. A search icon in the Home header opens `/search`
 
 ## 7. User Stories & Acceptance Criteria
 
-### Epic 1: Authentication
+### Epic 1: Authentication *(Phase 9)*
 
 **US-1.1** — Sign in with email magic link.
 
-- [ ] `/login` sends magic link; callback lands on Home
+- [ ] Deferred to Phase 9 — `/login` sends magic link; callback lands on Home
 - [ ] Invalid/expired links show clear error + retry
-- [ ] Session persists across browser restarts
+- [ ] Session persists across browser restarts; local data migrates on first login
 
 ---
 
@@ -235,7 +235,7 @@ Search is **not a bottom tab**. A search icon in the Home header opens `/search`
 
 **US-2.1** — Hold center button to record from any tab.
 
-- [ ] FAB is always visible in bottom nav (except login)
+- [ ] FAB is always visible in bottom nav
 - [ ] Hold starts recording; release stops and uploads
 - [ ] Visual feedback: pulse ring, timer, uploading state
 - [ ] Min 1s / max 180s per capture
@@ -863,24 +863,25 @@ Each phase is broken into **baby steps** — small, verifiable tasks completed i
 
 ### 16.0 Build Plan at a Glance
 
-**8 phases · 79 baby steps · ~23 days to MVP**
+**9 phases · Phases 0–8 ship without sign-in · Phase 9 adds auth + cloud sync**
 
 | Phase | Steps | Days | Focus | Exit criteria (must pass before next phase) |
 |-------|-------|------|-------|---------------------------------------------|
-| **0** | 9 | 1 | Project setup | `npm run dev` works; shadcn renders; Supabase project + env template ready |
-| **1** | 10 | 2–4 | Auth + nav shell | Magic link login; 4 tabs + FAB shell; DB migrated with RLS |
-| **2** | 10 | 5–7 | Voice capture | Hold FAB → transcript on Home; 3 captures work; timezone correct |
+| **0** | 9 | 1 | Project setup | `npm run dev` works; shadcn renders; env template ready |
+| **1** | 10 | 2–4 | Nav shell (no auth) | 4 tabs + FAB shell; overlay opens/closes |
+| **2** | 10 | 5–7 | Voice capture | Hold FAB → transcript on Home (localStorage); OpenAI key |
 | **3** | 12 | 8–11 | Flowchart AI | Merged 5-category flowchart; highlights + desktop connectors |
 | **4** | 9 | 12–14 | Habits | Create habit; voice auto-check; manual toggle; Home chips |
 | **5** | 8 | 15–17 | Calendar + search | Month dots; day detail; keyword search finds past entry |
 | **6** | 10 | 18–20 | Google + Profile | OAuth connect; today's events on Home; Profile complete |
-| **7** | 11 | 21–23 | PWA + launch | Installable PWA; deployed; T1–T17 smoke tests pass |
+| **7** | 11 | 21–23 | PWA + launch | Installable PWA; deployed; smoke tests pass |
+| **9** | 10 | 24–26 | **Auth + cloud sync** | Magic link login; middleware; migrate local → Supabase |
 
 **How to use this plan**
-1. Work phases in order (0 → 7).
-2. Complete every checkbox in a step before marking the step done.
-3. Verify the phase **exit criteria** before starting the next phase.
-4. See [Appendix B](#appendix-b-build-plan-master-index-79-steps) for a one-page index of all 79 steps.
+1. Work phases in order (0 → 7, then **9** before production if cloud sync required).
+2. Phases **2–8** use **localStorage** for journal data — no sign-in required.
+3. Complete every checkbox in a step before marking the step done.
+4. See [Appendix B](#appendix-b-build-plan-master-index) for step index.
 
 **Example flow (Phase 2 — Voice):**
 ```
@@ -949,53 +950,30 @@ Each phase is broken into **baby steps** — small, verifiable tasks completed i
 
 ---
 
-### Phase 1: Auth, DB & Navigation Shell (Days 2–4)
+### Phase 1: Navigation Shell (Days 2–4)
 
-**Goal:** User can sign in; all 4 tabs + FAB shell visible; database schema deployed.
+**Goal:** App shell with 4 tabs + FAB visible; no sign-in required. *(Auth → [Phase 9](#phase-9-auth--cloud-sync-days-2426).)*
 
-#### 1.1 — Write database migration
-- [ ] Create `supabase/migrations/001_init.sql`
-- [ ] Add `profiles` table with `timezone`, `google_calendar_connected`, `google_refresh_token`
-- [ ] Add `entry_status` enum + `voice_entries` table
-- [ ] Add `daily_journals` table with `structured JSONB`
-- [ ] Add `habits` + `habit_completions` tables
-- [ ] Add full-text search `tsvector` columns + GIN indexes
-- [ ] Add RLS policies: users CRUD own rows on all tables
-- [ ] Add trigger: on `auth.users` insert → create `profiles` row
-- [ ] Run migration via Supabase SQL editor or CLI
+#### 1.1 — Database migration SQL (prep for Phase 9)
+- [ ] Create `supabase/migrations/001_init.sql` — profiles, voice_entries, daily_journals, habits, RLS
+- [ ] **Do not require** running migration until Phase 9
 
-#### 1.2 — Supabase client helpers
-- [ ] Implement `lib/supabase/client.ts` (browser client with `createBrowserClient`)
-- [ ] Implement `lib/supabase/server.ts` (server client with cookies)
-- [ ] Implement `lib/supabase/middleware.ts` (session refresh helper)
+#### 1.2 — Supabase client helpers (prep for Phase 9)
+- [ ] Implement `lib/supabase/client.ts`, `server.ts`, `middleware.ts` stubs
 
-#### 1.3 — Auth middleware
-- [ ] Create `middleware.ts` at project root
-- [ ] Protect routes: `/`, `/calendar`, `/habits`, `/profile`, `/search`
-- [ ] Allow public: `/login`, `/auth/callback`
-- [ ] Redirect unauthenticated users to `/login`
-- [ ] Redirect authenticated users away from `/login` to `/`
+#### 1.3 — ~~Auth middleware~~ → **Phase 9**
+- [ ] No login redirect; app open on first visit
 
-#### 1.4 — Login page
-- [ ] Create `app/login/page.tsx` with email input + submit button
-- [ ] Call `supabase.auth.signInWithOtp({ email, options: { emailRedirectTo } })`
-- [ ] Show success state: "Check your email"
-- [ ] Handle errors: invalid email, rate limit (toast or inline message)
-- [ ] Style with cream background + centered card
+#### 1.4 — Login placeholder → **Phase 9**
+- [ ] `/login` shows "Phase 9" message + link to app
 
-#### 1.5 — Auth callback route
-- [ ] Create `app/auth/callback/route.ts`
-- [ ] Exchange auth code for session
-- [ ] Redirect to `/` on success
-- [ ] Redirect to `/login?error=auth` on failure
+#### 1.5 — ~~Auth callback~~ → **Phase 9**
 
-#### 1.6 — Profile timezone on first login
-- [ ] Create `lib/timezone.ts` with `detectBrowserTimezone()`
-- [ ] On auth callback or first Home load, upsert `profiles.timezone` from browser
-- [ ] Add `getTodayDateString(timezone)` and `getDayBounds(date, timezone)` stubs
+#### 1.6 — Browser timezone
+- [ ] `lib/timezone.ts` — used on Home/Profile (no Supabase upsert until Phase 9)
 
 #### 1.7 — App layout with bottom nav
-- [ ] Create `app/(app)/layout.tsx` — authenticated layout wrapper
+- [ ] Create `app/(app)/layout.tsx` — layout wrapper (no auth gate)
 - [ ] Create `components/navigation/BottomNav.tsx`:
   - [ ] 4 tab links: Home, Calendar, Habits, Profile
   - [ ] Center slot for FAB (placeholder circle, no recording yet)
@@ -1007,10 +985,9 @@ Each phase is broken into **baby steps** — small, verifiable tasks completed i
 - [ ] `app/(app)/page.tsx` — Home placeholder ("Home — coming soon")
 - [ ] `app/(app)/calendar/page.tsx` — Calendar placeholder
 - [ ] `app/(app)/habits/page.tsx` — Habits placeholder
-- [ ] `app/(app)/profile/page.tsx` — Profile with email, timezone, sign out button
+- [ ] `app/(app)/profile/page.tsx` — Profile placeholder (sign-in in Phase 9)
 
-#### 1.9 — Sign out
-- [ ] Wire sign out button on Profile → `supabase.auth.signOut()` → redirect `/login`
+#### 1.9 — ~~Sign out~~ → **Phase 9**
 
 #### 1.10 — RecordingOverlay shell
 - [ ] Create `components/navigation/RecordingOverlay.tsx`
@@ -1019,7 +996,41 @@ Each phase is broken into **baby steps** — small, verifiable tasks completed i
 - [ ] FAB `onPointerDown` opens overlay (no MediaRecorder yet); `onPointerUp` closes
 - [ ] Prevent body scroll when overlay open
 
-**Phase 1 exit criteria:** Magic link login works; 4 tabs navigate; FAB opens/closes overlay shell; DB tables exist with RLS; sign out works.
+**Phase 1 exit criteria:** 4 tabs navigate; FAB opens/closes overlay shell; **no sign-in required**.
+
+---
+
+### Phase 9: Auth & Cloud Sync (Days 24–26)
+
+**Goal:** Add magic-link sign-in, auth middleware, and migrate localStorage data to Supabase.
+
+#### 9.1 — Run Supabase migrations
+- [ ] Run `001_init.sql` + `002_storage.sql` in Supabase
+- [ ] Configure `.env.local` with Supabase + redirect URLs
+
+#### 9.2 — Auth middleware
+- [ ] Restore `middleware.ts` — protect routes; redirect unauthenticated → `/login`
+- [ ] Optional: keep “try without account” dev flag
+
+#### 9.3 — Magic-link login
+- [ ] Restore full `LoginForm` on `/login`
+- [ ] `/auth/callback` session exchange
+- [ ] Profile: email, sign out
+
+#### 9.4 — Cloud sync for voice entries
+- [ ] On sign-in: migrate `localStorage` captures to Supabase
+- [ ] `RecentRecordings` reads from API when authenticated, localStorage fallback when not
+- [ ] Re-enable `GET /api/voice-entries/today` as primary source
+
+#### 9.5 — Cloud sync for journals, habits, profile
+- [ ] Wire flowchart, habits, calendar to Supabase when authed
+- [ ] `TimezoneSync` → `profiles.timezone`
+
+#### 9.6 — Launch checklist auth items
+- [ ] Privacy policy; Supabase redirect URLs for production
+- [ ] Test magic link on iOS Safari + Android Chrome
+
+**Phase 9 exit criteria:** Sign in works; data persists across devices; local data migrates on first login.
 
 ---
 
@@ -1090,7 +1101,9 @@ Each phase is broken into **baby steps** — small, verifiable tasks completed i
 - [ ] Compose Home: header (date), RecentRecordings, empty flowchart placeholder
 - [ ] Empty state when no captures: "Hold the mic and tell me about your day"
 
-**Phase 2 exit criteria:** Record 3 captures from any tab; transcripts appear on Home; failed capture can retry; timezone grouping correct.
+**Phase 2 exit criteria:** Record 3 captures from any tab; transcripts appear on Home (localStorage); OpenAI key configured; timezone grouping correct.
+
+**Note:** No Supabase or sign-in required for Phase 2 — only `OPENAI_API_KEY`.
 
 ---
 
@@ -1391,7 +1404,7 @@ Each phase is broken into **baby steps** — small, verifiable tasks completed i
 - [ ] Deploy; verify production URL loads
 
 #### 7.10 — Production smoke test
-- [ ] Sign in via magic link on production
+- [ ] Open app on production (no sign-in required for Phases 0–7)
 - [ ] Record capture → transcript → flowchart
 - [ ] Create habit → voice auto-check
 - [ ] Connect Google Calendar → events on Home
@@ -1412,14 +1425,15 @@ Each phase is broken into **baby steps** — small, verifiable tasks completed i
 | Phase | Baby steps | Days | Focus |
 |-------|------------|------|-------|
 | 0 | 9 steps | 1 | Setup |
-| 1 | 10 steps | 2–4 | Auth + nav shell |
+| 1 | 10 steps | 2–4 | Nav shell (no auth) |
 | 2 | 10 steps | 5–7 | Voice capture |
 | 3 | 12 steps | 8–11 | Flowchart UI + AI |
 | 4 | 9 steps | 12–14 | Habits |
 | 5 | 8 steps | 15–17 | Calendar + search |
 | 6 | 10 steps | 18–20 | Google Calendar + profile |
 | 7 | 11 steps | 21–23 | PWA + launch |
-| **Total** | **79 baby steps** | **~23 days** | MVP ready |
+| 9 | 10 steps | 24–26 | Auth + cloud sync |
+| **Total** | **89 baby steps** | **~26 days** | MVP + optional auth |
 
 ---
 
@@ -1662,7 +1676,7 @@ These Structured features will **not** be built — they define the competitor's
 
 ---
 
-## Appendix B: Build Plan Master Index (79 Steps)
+## Appendix B: Build Plan Master Index
 
 Compact index of every baby step. Full checklists with sub-tasks are in [Section 16](#16-step-by-step-implementation-plan).
 
@@ -1679,18 +1693,18 @@ Compact index of every baby step. Full checklists with sub-tasks are in [Section
 | 0.8 | Create Supabase project (cloud) |
 | 0.9 | Stub folder structure |
 
-### Phase 1 — Auth, DB & Navigation Shell (10 steps)
+### Phase 1 — Navigation Shell (10 steps)
 | Step | Task |
 |------|------|
-| 1.1 | Write database migration |
-| 1.2 | Supabase client helpers |
-| 1.3 | Auth middleware |
-| 1.4 | Login page |
-| 1.5 | Auth callback route |
-| 1.6 | Profile timezone on first login |
+| 1.1 | Database migration SQL (prep for Phase 9) |
+| 1.2 | Supabase client helpers (prep) |
+| 1.3 | ~~Auth middleware~~ → Phase 9 |
+| 1.4 | Login placeholder → Phase 9 |
+| 1.5 | ~~Auth callback~~ → Phase 9 |
+| 1.6 | Browser timezone helpers |
 | 1.7 | App layout with bottom nav |
 | 1.8 | Empty tab pages |
-| 1.9 | Sign out |
+| 1.9 | ~~Sign out~~ → Phase 9 |
 | 1.10 | RecordingOverlay shell |
 
 ### Phase 2 — Voice Capture & Transcription (10 steps)
@@ -1777,6 +1791,16 @@ Compact index of every baby step. Full checklists with sub-tasks are in [Section
 | 7.10 | Production smoke test |
 | 7.11 | Documentation & launch checklist |
 
+### Phase 9 — Auth & Cloud Sync (10 steps)
+| Step | Task |
+|------|------|
+| 9.1 | Run Supabase migrations |
+| 9.2 | Auth middleware |
+| 9.3 | Magic-link login + callback |
+| 9.4 | Cloud sync — voice entries |
+| 9.5 | Cloud sync — journals, habits, profile |
+| 9.6 | Launch checklist auth items |
+
 ---
 
-*End of PRD v2.3*
+*End of PRD v2.4*
