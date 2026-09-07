@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils';
 type HabitCompactTileProps = {
   habit: HabitWithTodayStatus;
   index: number;
+  selected?: boolean;
   onOpenDetail: () => void;
   onToggleToday: () => void;
 };
@@ -24,6 +25,7 @@ type HabitCompactTileProps = {
 export function HabitCompactTile({
   habit,
   index,
+  selected = false,
   onOpenDetail,
   onToggleToday,
 }: HabitCompactTileProps) {
@@ -43,15 +45,19 @@ export function HabitCompactTile({
   return (
     <article
       className={cn(
-        'flex w-[7.5rem] shrink-0 flex-col rounded-2xl border border-black/[0.04] bg-card p-3 shadow-[0_1px_4px_rgba(0,0,0,0.04)]',
-        habit.completedToday && 'ring-1 ring-decisions/25',
+        'flex w-[7.5rem] shrink-0 flex-col rounded-2xl border bg-card p-3 shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-shadow',
+        selected
+          ? 'border-primary/40 ring-2 ring-primary/20 shadow-[0_2px_12px_rgba(101,129,162,0.15)]'
+          : 'border-black/[0.04]',
+        habit.completedToday && !selected && 'ring-1 ring-decisions/25',
       )}
     >
       <button
         type="button"
         onClick={onOpenDetail}
         className="flex flex-col items-center gap-1 text-center"
-        aria-label={`Open ${habit.name} breakdown`}
+        aria-label={`${selected ? 'Close' : 'Open'} ${habit.name} breakdown`}
+        aria-expanded={selected}
       >
         <span
           className="flex size-14 items-center justify-center rounded-2xl text-3xl transition-transform hover:scale-105"

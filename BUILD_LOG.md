@@ -448,3 +448,56 @@ Manual: add habit "Meditate" → record "I meditated this morning" → habit aut
 **Run 7 — Phase 5:** Calendar month grid, day detail, keyword search.
 
 ---
+
+## Run 7 — Phase 5: Calendar Tab & Search
+
+**Date:** September 6, 2026  
+**Phase:** 5  
+**Goal:** Browse past days on calendar; search journals by keyword  
+**Status:** Complete (local-first; Supabase APIs ready for Phase 9)
+
+### Steps completed
+
+| Step | Task | Status |
+|------|------|--------|
+| 5.1 | Calendar month API | Done |
+| 5.2 | DayCell component | Done |
+| 5.3 | MonthGrid component | Done |
+| 5.4 | Calendar tab page | Done |
+| 5.5 | Day detail page | Done |
+| 5.6 | Search API | Done |
+| 5.7 | SearchBar + SearchResults | Done |
+| 5.8 | Search page + Home header link | Done |
+
+### What was built
+
+#### Calendar (local-first)
+- `lib/calendar-stats.ts`, `lib/calendar-month.ts` — month grid cells + journaled dates from localStorage
+- `hooks/useCalendarMonth.ts` — reactive month dots on journal/capture changes
+- `DayCell`, `MonthGrid` — month navigation, dots on journaled days, today ring
+- `/calendar` — full month grid
+- `/calendar/[date]` — day detail with flowchart + recordings (reuses `DayFlowchart` + `RecentRecordings`)
+
+#### Search
+- `lib/local-search.ts` — client keyword search across transcripts + flowcharts
+- `GET /api/search` — Postgres full-text search when authed (Phase 9)
+- `SearchBar` (300ms debounce, min 2 chars), `SearchResults` with highlighted snippets
+- `/search` page; search icon in Home header
+
+#### API (Phase 9 ready)
+- `GET /api/calendar/month?year=&month=` — Supabase journal dates when signed in
+
+### Verification
+
+```bash
+npm run lint   # ✓ pass
+npm run build  # ✓ pass
+```
+
+Manual: record on multiple days → Calendar shows dots → tap day opens flowchart; search finds keyword → tap result opens day detail.
+
+### Next run
+
+**Run 8 — Phase 6:** Google Calendar OAuth, events strip on Home, Profile completion.
+
+---

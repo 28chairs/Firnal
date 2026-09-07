@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { AddHabitModal } from '@/components/habits/AddHabitModal';
 import { HabitCompactTile } from '@/components/habits/HabitCompactTile';
-import { HabitDetailDialog } from '@/components/habits/HabitDetailDialog';
+import { HabitDetailPanel } from '@/components/habits/HabitDetailPanel';
 import { HabitsTodayBanner } from '@/components/habits/HabitsTodayBanner';
 import { useHabits } from '@/hooks/useHabits';
 import { detectBrowserTimezone, getTodayDateString } from '@/lib/timezone';
@@ -14,9 +14,19 @@ export function HabitList() {
   const { habits, create, toggle } = useHabits(date);
   const [modalOpen, setModalOpen] = useState(false);
   const [detailId, setDetailId] = useState<string | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   const detailIndex = habits.findIndex((habit) => habit.id === detailId);
   const detailHabit = detailIndex >= 0 ? habits[detailIndex] : null;
+
+  const toggleDetail = (habitId: string) => {
+    setDetailId((current) => (current === habitId ? null : habitId));
+  };
+
+  useEffect(() => {
+    if (!detailId || !panelRef.current) return;
+    panelRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [detailId]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -33,14 +43,15 @@ export function HabitList() {
           </p>
         </div>
       ) : (
-        <section aria-label="Your habits">
+        <section aria-label="Your habits" className="flex flex-col gap-3">
           <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 pt-0.5">
             {habits.map((habit, index) => (
               <HabitCompactTile
                 key={habit.id}
                 habit={habit}
                 index={index}
-                onOpenDetail={() => setDetailId(habit.id)}
+                selected={detailId === habit.id}
+                onOpenDetail={() => toggleDetail(habit.id)}
                 onToggleToday={() => toggle(habit.id)}
               />
             ))}
@@ -55,9 +66,21 @@ export function HabitList() {
               <span className="text-xs font-medium">Add habit</span>
             </button>
           </div>
-          <p className="mt-2 px-0.5 text-[11px] text-muted-foreground">
-            Tap an emoji for the full breakdown · Check in from the tile or inside details
-          </p>
+
+          {detailHabit ? (
+            <div ref={panelRef}>
+              <HabitDetailPanel
+                habit={detailHabit}
+                index={detailIndex}
+                onClose={() => setDetailId(null)}
+                onToggle={toggle}
+              />
+            </div>
+          ) : (
+            <p className="px-0.5 text-[11px] text-muted-foreground">
+              Tap an emoji to see the breakdown below · Check in from the tile or in details
+            </p>
+          )}
         </section>
       )}
 
@@ -78,16 +101,6 @@ export function HabitList() {
           create(name, emoji, goalDays);
           setModalOpen(false);
         }}
-      />
-
-      <HabitDetailDialog
-        habit={detailHabit}
-        index={detailIndex >= 0 ? detailIndex : 0}
-        open={detailId !== null}
-        onOpenChange={(open) => {
-          if (!open) setDetailId(null);
-        }}
-        onToggle={toggle}
       />
     </div>
   );

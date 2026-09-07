@@ -11,10 +11,10 @@ import { useDayJournal } from '@/hooks/useDayJournal';
 import { detectBrowserTimezone, getTodayDateString } from '@/lib/timezone';
 import type { CategoryKey } from '@/lib/categories';
 
-export function DayFlowchart() {
+export function DayFlowchart({ date }: { date?: string }) {
   const timezone = detectBrowserTimezone();
-  const date = getTodayDateString(timezone);
-  const { breakdown, generatedAt, error, generating, retry } = useDayJournal(date);
+  const resolvedDate = date ?? getTodayDateString(timezone);
+  const { breakdown, generatedAt, error, generating, retry } = useDayJournal(resolvedDate);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const spanRefsRef = useRef<SpanRefMap>(new Map());

@@ -2,9 +2,14 @@
 
 import { useSyncExternalStore } from 'react';
 import { format } from 'date-fns';
-import { getLocalCapturesForToday } from '@/lib/local-captures';
+import { getLocalCapturesForDate } from '@/lib/local-captures';
 import { CAPTURES_CHANGED_EVENT } from '@/lib/recording';
+import { detectBrowserTimezone, getTodayDateString } from '@/lib/timezone';
 import type { VoiceEntry } from '@/lib/types/voice';
+
+type RecentRecordingsProps = {
+  date?: string;
+};
 
 function subscribe(onStoreChange: () => void) {
   window.addEventListener(CAPTURES_CHANGED_EVENT, onStoreChange);
@@ -12,8 +17,7 @@ function subscribe(onStoreChange: () => void) {
 }
 
 const EMPTY_ENTRIES: VoiceEntry[] = [];
-
-let clientSnapshot: VoiceEntry[] = EMPTY_ENTRIES;
+const snapshotByDate = new Map<string, VoiceEntry[]>();
 
 function entriesChanged(a: VoiceEntry[], b: VoiceEntry[]) {
   if (a.length !== b.length) return true;
@@ -26,29 +30,37 @@ function entriesChanged(a: VoiceEntry[], b: VoiceEntry[]) {
   );
 }
 
-function getClientSnapshot() {
-  const next = getLocalCapturesForToday();
-  if (entriesChanged(clientSnapshot, next)) {
-    clientSnapshot = next;
+function getClientSnapshotForDate(date: string) {
+  const next = getLocalCapturesForDate(date);
+  const cached = snapshotByDate.get(date);
+  if (cached && !entriesChanged(cached, next)) {
+    return cached;
   }
-  return clientSnapshot;
+  snapshotByDate.set(date, next);
+  return next;
 }
 
 function getServerSnapshot() {
   return EMPTY_ENTRIES;
 }
 
-export function RecentRecordings() {
+export function RecentRecordings({ date }: RecentRecordingsProps) {
+  const timezone = detectBrowserTimezone();
+  const resolvedDate = date ?? getTodayDateString(timezone);
+  const isToday = resolvedDate === getTodayDateString(timezone);
+
   const entries = useSyncExternalStore(
     subscribe,
-    getClientSnapshot,
+    () => getClientSnapshotForDate(resolvedDate),
     getServerSnapshot,
   );
 
   if (entries.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        No captures yet today. Hold the mic button and tell me about your day.
+        {isToday
+          ? 'No captures yet today. Hold the mic button and tell me about your day.'
+          : 'No recordings for this day.'}
       </p>
     );
   }
@@ -56,7 +68,10 @@ export function RecentRecordings() {
   return (
     <ul className="flex flex-col gap-3">
       {entries.map((entry) => (
-        <li key={entry.id} className="rounded-2xl border border-black/[0.04] bg-card p-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <li
+          key={entry.id}
+          className="rounded-2xl border border-black/[0.04] bg-card p-3.5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+        >
           <div className="mb-1 flex items-center justify-between gap-2">
             <span className="text-xs font-medium text-muted-foreground">
               {format(new Date(entry.recordedAt), 'h:mm a')}

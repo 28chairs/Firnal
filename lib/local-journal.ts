@@ -116,3 +116,9 @@ export function notifyJournalChanged() {
     window.dispatchEvent(new Event(JOURNAL_CHANGED_EVENT));
   }
 }
+
+/** Dates with a saved flowchart breakdown. */
+export function listLocalJournalDates(): string[] {
+  const store = readStore();
+  return Object.keys(store).filter((date) => store[date]?.breakdown != null);
+}
