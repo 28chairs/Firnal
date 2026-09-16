@@ -107,16 +107,16 @@ function RecordingItem({ entry }: { entry: VoiceEntry }) {
     if (isRetrying) return;
 
     if (!navigator.onLine) {
-      toast.error('Still offline — connect to retry');
+      toast.error('Still offline');
       return;
     }
 
     setIsRetrying(true);
     try {
       await retryCapture(entry.id);
-      toast.success('Transcription complete!');
+      toast.success('Done!');
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Retry failed');
+      toast.error(err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setIsRetrying(false);
     }
@@ -186,10 +186,10 @@ function RecordingItem({ entry }: { entry: VoiceEntry }) {
 
 function preview(text: string | null, status: VoiceEntry['status']) {
   if (status === 'queued' || status === 'uploading') {
-    return 'Waiting to transcribe…';
+    return 'Audio saved, waiting for network…';
   }
   if (status === 'transcribing') {
-    return 'Transcribing…';
+    return 'Processing…';
   }
   if (!text) return '—';
   return text.length > 120 ? `${text.slice(0, 120)}…` : text;
@@ -207,22 +207,22 @@ function StatusBadge({
     { label: string; icon: React.ReactNode; className: string }
   > = {
     queued: {
-      label: 'Saved locally',
+      label: 'Saved',
       icon: <FileAudio className="size-3" />,
-      className: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+      className: 'bg-muted text-muted-foreground',
     },
     uploading: {
-      label: 'Uploading',
+      label: 'Syncing',
       icon: <Upload className="size-3 animate-pulse" />,
       className: 'bg-primary/10 text-primary',
     },
     pending: {
-      label: 'Pending',
+      label: 'Saved',
       icon: <Clock className="size-3" />,
       className: 'bg-muted text-muted-foreground',
     },
     transcribing: {
-      label: 'Transcribing',
+      label: 'Processing',
       icon: <Loader2 className="size-3 animate-spin" />,
       className: 'bg-primary/10 text-primary',
     },
@@ -232,7 +232,7 @@ function StatusBadge({
       className: 'bg-decisions/15 text-decisions',
     },
     failed: {
-      label: 'Failed',
+      label: 'Retry',
       icon: <AlertCircle className="size-3" />,
       className: 'bg-destructive/10 text-destructive',
     },
