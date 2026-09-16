@@ -884,3 +884,23 @@ npm run build  # ✓ pass
 - Google Calendar colors mapped to CSS (11 Google colors supported)
 
 ---
+
+---
+
+## Run 11 — Phase 8: iPhone App (Capacitor) — started
+
+**Date:** September 16, 2026  
+**Phase:** 8  
+**Goal:** Capacitor iOS shell + run on Chair Phone via Xcode  
+**Status:** In progress (device offline at scaffold time)
+
+### Done so far
+- PRD Phase 8 section added
+- Capacitor init (`app.firnal.journal`)
+- `ios/` Xcode project + mic + local network plist keys
+- `docs/IOS_DEVICE_SETUP.md`
+- Dev `server.url` → `http://192.168.1.11:3000`
+
+### Blocked
+- Chair Phone listed under **Devices Offline** — needs unlock / USB / Developer Mode
+
