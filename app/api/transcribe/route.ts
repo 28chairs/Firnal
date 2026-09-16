@@ -101,6 +101,15 @@ async function transcribeLocalOnly({
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Transcription failed';
     const isNoSpeech = message.toLowerCase().includes('no speech');
+    const isApiKeyMissing = message.toLowerCase().includes('openai_api_key');
+
+    if (isApiKeyMissing) {
+      return NextResponse.json(
+        { error: 'OPENAI_API_KEY is not configured. Please add it to your .env.local file.' },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json({ error: message }, { status: isNoSpeech ? 422 : 500 });
   }
 }
@@ -177,6 +186,7 @@ async function transcribeWithDatabase({
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Transcription failed';
     const isNoSpeech = message.toLowerCase().includes('no speech');
+    const isApiKeyMissing = message.toLowerCase().includes('openai_api_key');
 
     await supabase
       .from('voice_entries')
@@ -185,6 +195,13 @@ async function transcribeWithDatabase({
         error_message: message,
       })
       .eq('id', entry.id);
+
+    if (isApiKeyMissing) {
+      return NextResponse.json(
+        { error: 'OPENAI_API_KEY is not configured. Please add it to your .env.local file.' },
+        { status: 503 }
+      );
+    }
 
     return NextResponse.json({ error: message }, { status: isNoSpeech ? 422 : 500 });
   }

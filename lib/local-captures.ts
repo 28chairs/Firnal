@@ -1,6 +1,7 @@
-import type { VoiceEntry } from '@/lib/types/voice';
+import type { VoiceEntry, ErrorCategory } from '@/lib/types/voice';
 import { detectBrowserTimezone, getTodayDateString } from '@/lib/timezone';
 import { formatInTimeZone } from 'date-fns-tz';
+import { notifyCapturesChanged } from '@/lib/recording';
 
 const STORAGE_KEY = 'firnal:voice-entries';
 
@@ -18,6 +19,93 @@ function readAll(): VoiceEntry[] {
 
 function writeAll(entries: VoiceEntry[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+}
+
+export function createDraftCapture(
+  id: string,
+  recordedAt: string,
+  durationMs: number | null
+): VoiceEntry {
+  return {
+    id,
+    recordedAt,
+    transcript: null,
+    status: 'queued',
+    errorMessage: null,
+    errorCategory: undefined,
+    durationMs,
+    retryCount: 0,
+  };
+}
+
+export function setUploadingStatus(id: string) {
+  const all = readAll().map((entry) =>
+    entry.id === id ? { ...entry, status: 'uploading' as const, errorMessage: null, errorCategory: undefined } : entry
+  );
+  writeAll(all);
+  notifyCapturesChanged();
+}
+
+export function setTranscribingStatus(id: string) {
+  const all = readAll().map((entry) =>
+    entry.id === id ? { ...entry, status: 'transcribing' as const } : entry
+  );
+  writeAll(all);
+  notifyCapturesChanged();
+}
+
+export function setTranscribedStatus(id: string, transcript: string) {
+  const all = readAll().map((entry) =>
+    entry.id === id
+      ? { ...entry, status: 'transcribed' as const, transcript, errorMessage: null, errorCategory: undefined }
+      : entry
+  );
+  writeAll(all);
+  notifyCapturesChanged();
+}
+
+export function setFailedStatus(
+  id: string,
+  errorMessage: string,
+  errorCategory: ErrorCategory
+) {
+  const all = readAll().map((entry) =>
+    entry.id === id
+      ? {
+          ...entry,
+          status: 'failed' as const,
+          errorMessage,
+          errorCategory,
+          retryCount: (entry.retryCount ?? 0) + 1,
+        }
+      : entry
+  );
+  writeAll(all);
+  notifyCapturesChanged();
+}
+
+export function setQueuedForRetry(id: string) {
+  const all = readAll().map((entry) =>
+    entry.id === id
+      ? { ...entry, status: 'queued' as const, errorMessage: null, errorCategory: undefined }
+      : entry
+  );
+  writeAll(all);
+  notifyCapturesChanged();
+}
+
+export function getFailedCaptures(): VoiceEntry[] {
+  return readAll().filter((entry) => entry.status === 'failed');
+}
+
+export function getQueuedCaptures(): VoiceEntry[] {
+  return readAll().filter((entry) => entry.status === 'queued');
+}
+
+export function getPendingCaptures(): VoiceEntry[] {
+  return readAll().filter(
+    (entry) => entry.status === 'queued' || entry.status === 'uploading' || entry.status === 'transcribing'
+  );
 }
 
 export function getLocalCapturesForDate(date: string): VoiceEntry[] {
