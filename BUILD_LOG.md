@@ -756,3 +756,131 @@ npm run build  # ✓ pass
 - [x] App still opens without auth/Supabase
 
 ---
+
+## Run 10 — Phase 6: Google Calendar & Profile
+
+**Date:** September 16, 2026  
+**Phase:** 6  
+**Goal:** Google Calendar OAuth connect + events strip on Home + Profile completion  
+**Status:** Complete (requires Google OAuth credentials to test)
+
+### Steps completed
+
+| Step | Task | Status |
+|------|------|--------|
+| 6.1 | Documentation (env example + setup guide) | Done |
+| 6.2 | OAuth start route (`GET /api/auth/google`) | Done |
+| 6.3 | OAuth callback route (`/api/auth/google/callback`) | Done |
+| 6.4 | Disconnect route (`DELETE /api/auth/google/disconnect`) | Done |
+| 6.5 | Google Calendar client library | Done |
+| 6.6 | Calendar events API (`GET /api/calendar/events`) | Done |
+| 6.7 | CalendarEventsStrip component | Done |
+| 6.8 | GoogleCalendarConnect component | Done |
+| 6.9 | Profile page completion | Done |
+| 6.10 | Home page CalendarEventsStrip integration | Done |
+
+### What was built
+
+#### 6.1 — Documentation
+- Updated `.env.local.example` with Google OAuth vars and notes
+- Created `docs/GOOGLE_CALENDAR_SETUP.md` — step-by-step Google Console setup
+
+#### 6.2–6.4 — OAuth Routes
+- **`GET /api/auth/google`** — CSRF state cookie, redirect to Google consent (calendar.readonly scope)
+- **`/api/auth/google/callback`** — verify state, exchange code, store tokens in httpOnly cookies
+- **`DELETE /api/auth/google/disconnect`** — clear tokens
+- **`GET /api/auth/google/status`** — check connection status for UI
+
+#### 6.5–6.6 — Calendar Client + API
+- **`lib/google-calendar.ts`** — token refresh, `fetchTodayEvents(timezone)`, event mapping
+- **`lib/local-google.ts`** — localStorage connection state for UI (email display)
+- **`GET /api/calendar/events`** — today's events with 15-min cache, 401→empty if not connected
+
+#### 6.7–6.10 — UI Components
+- **`CalendarEventsStrip`** — horizontal scrollable strip with time + title + Google Calendar colors
+  - Loading skeleton state
+  - Disconnected CTA linking to Profile
+  - Empty state when no events
+  - Click to open event in Google Calendar
+- **`GoogleCalendarConnect`** — Connect / Connected / Disconnect states
+  - Error handling for OAuth failures
+  - Shows connected email when available
+- **Profile page** — Appearance, Google Calendar, Timezone, Account placeholder, Widget coming soon
+- **Home page** — CalendarEventsStrip below TodayHeader
+
+### Token Storage Strategy
+
+| Token | Storage | Why |
+|-------|---------|-----|
+| Refresh token | httpOnly cookie (1 year) | Secure, survives page refresh |
+| Access token | httpOnly cookie (1 hour) | Auto-refreshed from refresh token |
+| Connection UI flag | localStorage | For showing email on Profile |
+
+### Files created / modified
+
+```
+.env.local.example                           — updated Google vars
+docs/GOOGLE_CALENDAR_SETUP.md                — new
+lib/google-calendar.ts                       — new
+lib/local-google.ts                          — new
+app/api/auth/google/route.ts                 — new
+app/api/auth/google/callback/route.ts        — new
+app/api/auth/google/disconnect/route.ts      — new
+app/api/auth/google/status/route.ts          — new
+app/api/calendar/events/route.ts             — new
+components/home/CalendarEventsStrip.tsx      — new
+components/profile/GoogleCalendarConnect.tsx — new
+app/(app)/profile/page.tsx                   — updated
+app/(app)/page.tsx                           — updated
+```
+
+### Manual Test Steps
+
+**Prerequisite:** Configure Google OAuth credentials (see `docs/GOOGLE_CALENDAR_SETUP.md`)
+
+1. Add to `.env.local`:
+   ```
+   GOOGLE_CLIENT_ID=your-client-id
+   GOOGLE_CLIENT_SECRET=your-secret
+   GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google/callback
+   ```
+
+2. Start dev server: `npm run dev`
+
+3. **Test Connect Flow:**
+   - Go to Profile → Google Calendar section
+   - Click "Connect Google Calendar"
+   - Complete Google OAuth consent
+   - Verify redirect back to Profile with "Connected" status
+
+4. **Test Events Display:**
+   - Go to Home
+   - If events exist for today, they appear in the CalendarEventsStrip
+   - Click event to open in Google Calendar
+
+5. **Test Disconnect:**
+   - Go to Profile → Google Calendar
+   - Click "Disconnect"
+   - Home should show "Connect Google Calendar" CTA
+
+6. **Test Missing Credentials:**
+   - Remove `GOOGLE_CLIENT_ID` from env
+   - Restart server
+   - Click Connect → should show clear error message (not crash)
+
+### Verification
+
+```bash
+npm run lint   # ✓ pass
+npm run build  # ✓ pass
+```
+
+### Notes
+
+- OAuth tokens stored in httpOnly cookies, not localStorage (security best practice)
+- No Supabase/auth required — works with local-first approach
+- Events refresh every 15 minutes (via API cache + client poll)
+- Phase 9 can migrate connection state to `profiles` table when auth is added
+- Google Calendar colors mapped to CSS (11 Google colors supported)
+
+---
