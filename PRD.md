@@ -863,7 +863,7 @@ Each phase is broken into **baby steps** — small, verifiable tasks completed i
 
 ### 16.0 Build Plan at a Glance
 
-**9 phases · Phases 0–8 ship without sign-in · Phase 9 adds auth + cloud sync**
+**10 phases · Phases 0–8 ship without sign-in (Phase 8 = iPhone Capacitor) · Phase 9 adds auth + cloud sync**
 
 | Phase | Steps | Days | Focus | Exit criteria (must pass before next phase) |
 |-------|-------|------|-------|---------------------------------------------|
@@ -997,6 +997,54 @@ Each phase is broken into **baby steps** — small, verifiable tasks completed i
 - [ ] Prevent body scroll when overlay open
 
 **Phase 1 exit criteria:** 4 tabs navigate; FAB opens/closes overlay shell; **no sign-in required**.
+
+---
+
+### Phase 8: iPhone App via Capacitor + Xcode (Days 24–26)
+
+**Goal:** Ship Firnal as an installable iPhone app on a physical device ("Chair Phone") using Capacitor + Xcode, without rewriting the product as a separate native UI.
+
+**Approach:** Wrap the existing Next.js PWA in a Capacitor iOS shell (WKWebView). Dev builds point at the local Next server on the Mac LAN; release builds point at the production URL (or bundled static export when ready).
+
+#### 8.1 — PRD & tooling
+- [ ] Document Phase 8 in PRD (this section)
+- [ ] Install Capacitor (`@capacitor/core`, `@capacitor/cli`, `@capacitor/ios`)
+- [ ] `capacitor.config.ts` with app id `app.firnal.journal`, app name `FIRNAL`
+
+#### 8.2 — iOS project
+- [ ] `npx cap add ios` → `ios/` Xcode project
+- [ ] Configure ATS / localhost or LAN exceptions for dev server
+- [ ] Mic permission (`NSMicrophoneUsageDescription`) for voice capture
+- [ ] Status bar / safe-area alignment with existing bottom nav
+
+#### 8.3 — Dev connect to Chair Phone
+- [ ] Run Next on Mac (`npm run dev` bound to LAN IP, not only 127.0.0.1)
+- [ ] Point Capacitor `server.url` at `http://<mac-lan-ip>:3000` for live reload
+- [ ] Open `ios/App/App.xcworkspace` in Xcode
+- [ ] Select physical device **Chair Phone** (UDID when online)
+- [ ] Signing: Personal Team or Apple Developer team; trust computer on device
+- [ ] Build & Run → Firnal opens on Chair Phone
+
+#### 8.4 — Native affordances (keep simple)
+- [ ] Splash screen using FIRNAL cream/rose branding
+- [ ] App icon from PWA icons (192/512)
+- [ ] Optional: `@capacitor/status-bar`, `@capacitor/splash-screen` only if needed
+- [ ] Do **not** rebuild features natively — WebView loads existing app
+
+#### 8.5 — Hardening
+- [ ] Test hold-to-record FAB on device Safari WebView
+- [ ] Test offline shell behavior with service worker (Phase 7)
+- [ ] Document runbook: `docs/IOS_DEVICE_SETUP.md`
+
+#### 8.6 — Commit
+- [ ] One commit: `feat(phase-8): Capacitor iOS shell for Chair Phone`
+- [ ] Update BUILD_LOG.md
+
+**Phase 8 exit criteria:** Firnal launches on Chair Phone from Xcode; mic permission prompt works; Home + FAB usable on device.
+
+**Non-goals:** App Store submission, TestFlight, full SwiftUI rewrite, home-screen record widget (still v2.0).
+
+**Depends on:** Phase 7 PWA icons/manifest (nice-to-have); Mac with Xcode; Chair Phone unlocked & trusted.
 
 ---
 
@@ -1790,6 +1838,16 @@ Compact index of every baby step. Full checklists with sub-tasks are in [Section
 | 7.9 | Production deployment |
 | 7.10 | Production smoke test |
 | 7.11 | Documentation & launch checklist |
+
+### Phase 8 — iPhone App via Capacitor + Xcode (6 steps)
+| Step | Task |
+|------|------|
+| 8.1 | Capacitor tooling + config |
+| 8.2 | Generate ios/ Xcode project + mic permission |
+| 8.3 | Dev server on LAN + run on Chair Phone |
+| 8.4 | Splash / icon (simple) |
+| 8.5 | Device test + IOS_DEVICE_SETUP.md |
+| 8.6 | Commit + BUILD_LOG |
 
 ### Phase 9 — Auth & Cloud Sync (10 steps)
 | Step | Task |
