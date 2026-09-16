@@ -10,6 +10,7 @@
   --font-sans: var(--font-sans);
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --font-heading: var(--font-sans);
+  --font-rounded: var(--font-nunito), var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -56,6 +57,9 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ========================================
+   BASE: Default fallback (Cream Journal)
+   ======================================== */
 :root {
   /* Soft-Nuances muted warmth light theme — cream + dusty rose brand */
   --background: #FAF9F6;
@@ -64,9 +68,9 @@
   --card-foreground: #1c1c1e;
   --popover: #ffffff;
   --popover-foreground: #1c1c1e;
-  --primary: #C45B6C;
+  --primary: var(--accent-override, #C45B6C);
   --primary-foreground: #ffffff;
-  --fab: #C45B6C;
+  --fab: var(--accent-override, #C45B6C);
   --fab-foreground: #ffffff;
   --secondary: #FAF5F5;
   --secondary-foreground: #7D736C;
@@ -77,25 +81,70 @@
   --destructive: #DC2626;
   --border: #e5e5ea;
   --input: #e5e5ea;
-  --ring: #C45B6C;
-  --chart-1: #C45B6C;
+  --ring: var(--accent-override, #C45B6C);
+  --chart-1: var(--accent-override, #C45B6C);
   --chart-2: #9BB87A;
   --chart-3: #D9A0A8;
   --chart-4: #7D736C;
   --chart-5: #E8A07A;
-  --radius: 0.875rem;
+  --radius: 1rem;
   --sidebar: #ffffff;
   --sidebar-foreground: #1c1c1e;
-  --sidebar-primary: #C45B6C;
+  --sidebar-primary: var(--accent-override, #C45B6C);
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #FAF9F6;
   --sidebar-accent-foreground: #1c1c1e;
   --sidebar-border: #e5e5ea;
-  --sidebar-ring: #C45B6C;
-  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
-    system-ui, sans-serif;
+  --sidebar-ring: var(--accent-override, #C45B6C);
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  
+  /* Spacing scale for density (Gen Z customization) */
+  --spacing-card: 1rem;
+  --spacing-section: 1rem;
+  --spacing-nav-height: 4rem;
+  --spacing-nav-icon: 1.25rem;
+  --text-scale: 1;
 }
 
+/* ========================================
+   THEME: Cream Journal (warm paper)
+   ======================================== */
+.theme-cream-journal {
+  --background: #FAF9F6;
+  --foreground: #2D2A26;
+  --card: #FFFFFF;
+  --card-foreground: #2D2A26;
+  --popover: #FFFFFF;
+  --popover-foreground: #2D2A26;
+  --primary: var(--accent-override, #C45B6C);
+  --primary-foreground: #FFFFFF;
+  --fab: var(--accent-override, #C45B6C);
+  --fab-foreground: #FFFFFF;
+  --secondary: #F5F0E8;
+  --secondary-foreground: #6B5C4D;
+  --muted: #F0EBE3;
+  --muted-foreground: #8B7E6E;
+  --accent: #F5F0E8;
+  --accent-foreground: #6B5C4D;
+  --destructive: #DC2626;
+  --border: #E8E0D4;
+  --input: #E8E0D4;
+  --ring: var(--accent-override, #C45B6C);
+  --chart-1: var(--accent-override, #C45B6C);
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #2D2A26;
+  --sidebar-primary: var(--accent-override, #C45B6C);
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #FAF9F6;
+  --sidebar-accent-foreground: #2D2A26;
+  --sidebar-border: #E8E0D4;
+  --sidebar-ring: var(--accent-override, #C45B6C);
+}
+
+/* ========================================
+   THEME: Midnight (dark-first Gen Z)
+   ======================================== */
+.theme-midnight,
 .dark {
   --background: #1c1c1e;
   --foreground: #FAF9F6;
@@ -103,9 +152,9 @@
   --card-foreground: #FAF9F6;
   --popover: #2c2c2e;
   --popover-foreground: #FAF9F6;
-  --primary: #D48490;
+  --primary: var(--accent-override, #D48490);
   --primary-foreground: #1c1c1e;
-  --fab: #D48490;
+  --fab: var(--accent-override, #D48490);
   --fab-foreground: #1c1c1e;
   --secondary: #3a3a3c;
   --secondary-foreground: #FAF9F6;
@@ -116,22 +165,137 @@
   --destructive: #ff6b6b;
   --border: #3a3a3c;
   --input: #3a3a3c;
-  --ring: #D48490;
-  --chart-1: #D48490;
+  --ring: var(--accent-override, #D48490);
+  --chart-1: var(--accent-override, #D48490);
   --chart-2: #9BB87A;
   --chart-3: #D9A0A8;
   --chart-4: #7D736C;
   --chart-5: #E8A07A;
   --sidebar: #2c2c2e;
   --sidebar-foreground: #FAF9F6;
-  --sidebar-primary: #D48490;
+  --sidebar-primary: var(--accent-override, #D48490);
   --sidebar-primary-foreground: #1c1c1e;
   --sidebar-accent: #3a3a3c;
   --sidebar-accent-foreground: #FAF9F6;
   --sidebar-border: #3a3a3c;
-  --sidebar-ring: #D48490;
+  --sidebar-ring: var(--accent-override, #D48490);
 }
 
+/* ========================================
+   THEME: Soft Pastel (tranquil)
+   ======================================== */
+.theme-soft-pastel {
+  --background: #FDF4FF;
+  --foreground: #3B1D44;
+  --card: #FFFFFF;
+  --card-foreground: #3B1D44;
+  --popover: #FFFFFF;
+  --popover-foreground: #3B1D44;
+  --primary: var(--accent-override, #A78BFA);
+  --primary-foreground: #FFFFFF;
+  --fab: var(--accent-override, #A78BFA);
+  --fab-foreground: #FFFFFF;
+  --secondary: #F3E8FF;
+  --secondary-foreground: #6B4D8A;
+  --muted: #F0E7FF;
+  --muted-foreground: #9D7FBD;
+  --accent: #F3E8FF;
+  --accent-foreground: #6B4D8A;
+  --destructive: #E11D48;
+  --border: #E9D5FF;
+  --input: #E9D5FF;
+  --ring: var(--accent-override, #A78BFA);
+  --chart-1: var(--accent-override, #A78BFA);
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #3B1D44;
+  --sidebar-primary: var(--accent-override, #A78BFA);
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #FDF4FF;
+  --sidebar-accent-foreground: #3B1D44;
+  --sidebar-border: #E9D5FF;
+  --sidebar-ring: var(--accent-override, #A78BFA);
+}
+
+/* ========================================
+   THEME: Structured Blue (original iOS)
+   ======================================== */
+.theme-structured-blue {
+  --background: #F2F2F7;
+  --foreground: #1C1C1E;
+  --card: #FFFFFF;
+  --card-foreground: #1C1C1E;
+  --popover: #FFFFFF;
+  --popover-foreground: #1C1C1E;
+  --primary: var(--accent-override, #6581A2);
+  --primary-foreground: #FFFFFF;
+  --fab: var(--accent-override, #6581A2);
+  --fab-foreground: #FFFFFF;
+  --secondary: #E8EDF3;
+  --secondary-foreground: #2C5073;
+  --muted: #EBEBF0;
+  --muted-foreground: #8E8E93;
+  --accent: #E8EDF3;
+  --accent-foreground: #2C5073;
+  --destructive: #C43A37;
+  --border: #E5E5EA;
+  --input: #E5E5EA;
+  --ring: var(--accent-override, #6581A2);
+  --chart-1: var(--accent-override, #6581A2);
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1C1C1E;
+  --sidebar-primary: var(--accent-override, #6581A2);
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F2F2F7;
+  --sidebar-accent-foreground: #1C1C1E;
+  --sidebar-border: #E5E5EA;
+  --sidebar-ring: var(--accent-override, #6581A2);
+}
+
+/* ========================================
+   FONT SIZE VARIANTS
+   ======================================== */
+.font-size-compact {
+  --text-scale: 0.9;
+  font-size: 90%;
+}
+
+.font-size-comfortable {
+  --text-scale: 1;
+  font-size: 100%;
+}
+
+.font-size-large {
+  --text-scale: 1.15;
+  font-size: 115%;
+}
+
+/* ========================================
+   DENSITY VARIANTS
+   ======================================== */
+.density-compact {
+  --spacing-card: 0.75rem;
+  --spacing-section: 0.75rem;
+  --spacing-nav-height: 3.5rem;
+  --spacing-nav-icon: 1.125rem;
+}
+
+.density-comfortable {
+  --spacing-card: 1rem;
+  --spacing-section: 1rem;
+  --spacing-nav-height: 4rem;
+  --spacing-nav-icon: 1.25rem;
+}
+
+/* ========================================
+   FONT STYLE VARIANTS
+   ======================================== */
+.font-style-rounded {
+  --font-sans: var(--font-nunito), -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+}
+
+/* ========================================
+   BASE LAYER STYLES
+   ======================================== */
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -142,19 +306,109 @@
     -moz-osx-font-smoothing: grayscale;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-200;
   }
-  h1,
-  h2,
-  h3,
-  h4 {
+  h1, h2, h3, h4 {
     @apply font-heading tracking-tight;
   }
 }
 
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
 @layer utilities {
   .structured-card {
-    @apply rounded-2xl border border-black/[0.04] bg-card shadow-[0_1px_4px_rgba(0,0,0,0.04)];
+    @apply rounded-2xl border border-black/[0.04] bg-card shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-shadow duration-200;
+  }
+  
+  .structured-card:hover {
+    @apply shadow-[0_2px_8px_rgba(0,0,0,0.08)];
+  }
+
+  /* Gen Z editorial card style */
+  .editorial-card {
+    @apply rounded-3xl bg-card p-[var(--spacing-card)] shadow-[0_2px_12px_rgba(0,0,0,0.04)] ring-1 ring-black/[0.03] transition-all duration-200;
+  }
+
+  .editorial-card:hover {
+    @apply shadow-[0_4px_20px_rgba(0,0,0,0.08)] ring-black/[0.06];
+  }
+
+  /* Warm empty state styling */
+  .empty-state {
+    @apply rounded-3xl border-2 border-dashed border-border/60 bg-muted/30 px-6 py-10 text-center;
+  }
+
+  /* FAB glow effect */
+  .fab-glow {
+    box-shadow: 0 4px 20px color-mix(in srgb, var(--fab) 35%, transparent);
+  }
+
+  /* Subtle hover lift */
+  .hover-lift {
+    @apply transition-transform duration-200;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-1px);
+  }
+
+  /* Soft focus ring */
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+}
+
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .hover-lift:hover {
+    transform: none;
+  }
+}
+
+/* ========================================
+   DARK MODE OVERRIDES FOR CATEGORY COLORS
+   ======================================== */
+.dark {
+  --color-commitments: #ef5350;
+  --color-decisions: #81c784;
+  --color-ideas: #90caf9;
+  --color-people: #64b5f6;
+  --color-questions: #ffab91;
+}
+
+/* ========================================
+   SCROLLBAR STYLING (optional polish)
+   ======================================== */
+@supports selector(::-webkit-scrollbar) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--muted-foreground);
+    border-radius: 4px;
+    opacity: 0.5;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    opacity: 0.8;
   }
 }
 

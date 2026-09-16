@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { DayCell } from '@/components/calendar/DayCell';
 import { Button } from '@/components/ui/button';
 import { useCalendarMonth } from '@/hooks/useCalendarMonth';
@@ -25,13 +25,7 @@ export function MonthGrid() {
   const journalDates = useCalendarMonth(year, month);
   const monthLabel = getMonthLabelFor(year, month, timezone);
   const padding = getMonthGridPaddingFor(year, month, timezone);
-  const cells = getCalendarMonthCells(
-    year,
-    month,
-    today,
-    timezone,
-    journalDates,
-  );
+  const cells = getCalendarMonthCells(year, month, today, timezone, journalDates);
   const hasEntries = cells.some((cell) => cell.hasJournal);
 
   const goMonth = (delta: -1 | 1) => {
@@ -41,24 +35,24 @@ export function MonthGrid() {
   };
 
   return (
-    <section className="flex flex-col gap-4 rounded-2xl border border-black/[0.04] bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+    <section className="flex flex-col gap-4 rounded-3xl border border-border/60 bg-card p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)] transition-shadow duration-200 hover:shadow-[0_4px_20px_rgba(0,0,0,0.06)]">
       <header className="flex items-center justify-between gap-2">
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="size-9 shrink-0"
+          className="size-10 shrink-0 rounded-xl transition-all duration-200 hover:bg-muted"
           onClick={() => goMonth(-1)}
           aria-label="Previous month"
         >
           <ChevronLeft className="size-5" />
         </Button>
-        <h2 className="text-base font-semibold tracking-tight">{monthLabel}</h2>
+        <h2 className="text-lg font-semibold tracking-tight">{monthLabel}</h2>
         <Button
           type="button"
           variant="ghost"
           size="icon"
-          className="size-9 shrink-0"
+          className="size-10 shrink-0 rounded-xl transition-all duration-200 hover:bg-muted"
           onClick={() => goMonth(1)}
           aria-label="Next month"
         >
@@ -70,7 +64,7 @@ export function MonthGrid() {
         {WEEK_HEADERS.map((label) => (
           <span
             key={label}
-            className="pb-1 text-center text-[11px] font-medium text-muted-foreground"
+            className="pb-2 text-center text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
           >
             {label}
           </span>
@@ -84,7 +78,10 @@ export function MonthGrid() {
       </div>
 
       {!hasEntries && (
-        <p className="text-center text-sm text-muted-foreground">No entries this month</p>
+        <div className="flex flex-col items-center gap-2 py-4 text-center">
+          <Calendar className="size-8 text-muted-foreground/50" />
+          <p className="text-sm text-muted-foreground">No entries this month</p>
+        </div>
       )}
     </section>
   );
