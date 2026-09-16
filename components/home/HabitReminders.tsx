@@ -50,16 +50,14 @@ export function HabitReminders() {
             </span>
             <span className="font-medium">{habit.name}</span>
             {habit.completedToday && (
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1 text-xs">
                 {habit.todaySource === 'voice' ? (
-                  <>
+                  <span className="flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-primary">
                     <Mic2 className="size-3" />
-                    voice
-                  </>
+                    <span className="text-[10px] font-medium">voice</span>
+                  </span>
                 ) : (
-                  <>
-                    <CheckCircle2 className="size-3 text-decisions" />
-                  </>
+                  <CheckCircle2 className="size-3 text-decisions" />
                 )}
               </span>
             )}
