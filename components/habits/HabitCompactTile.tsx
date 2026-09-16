@@ -1,6 +1,6 @@
 'use client';
 
-import { Flame } from 'lucide-react';
+import { Flame, Check } from 'lucide-react';
 import { getAllCompletions } from '@/lib/local-habits';
 import { getGoalAnalytics } from '@/lib/habit-goals';
 import {
@@ -45,33 +45,35 @@ export function HabitCompactTile({
   return (
     <article
       className={cn(
-        'flex w-[7.5rem] shrink-0 flex-col rounded-2xl border bg-card p-3 shadow-[0_1px_4px_rgba(0,0,0,0.04)] transition-shadow',
+        'flex w-[7.5rem] shrink-0 flex-col rounded-2xl border-2 bg-card p-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)] transition-all duration-200',
         selected
-          ? 'border-primary/40 ring-2 ring-primary/20 shadow-[0_2px_12px_rgba(101,129,162,0.15)]'
-          : 'border-black/[0.04]',
-        habit.completedToday && !selected && 'ring-1 ring-decisions/25',
+          ? 'border-primary/50 shadow-[0_4px_16px_rgba(0,0,0,0.08)] scale-[1.02]'
+          : 'border-border/60 hover:border-border hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)]',
+        habit.completedToday && !selected && 'border-decisions/40 bg-decisions/5'
       )}
     >
       <button
         type="button"
         onClick={onOpenDetail}
-        className="flex flex-col items-center gap-1 text-center"
+        className="flex flex-col items-center gap-1.5 text-center"
         aria-label={`${selected ? 'Close' : 'Open'} ${habit.name} breakdown`}
         aria-expanded={selected}
       >
         <span
-          className="flex size-14 items-center justify-center rounded-2xl text-3xl transition-transform hover:scale-105"
-          style={{ backgroundColor: `${accentColor}20` }}
+          className="flex size-14 items-center justify-center rounded-2xl text-3xl transition-transform duration-200 hover:scale-110"
+          style={{ backgroundColor: `${accentColor}15` }}
         >
           {habit.emoji}
         </span>
-        <span className="line-clamp-2 w-full text-xs font-semibold leading-tight">{habit.name}</span>
+        <span className="line-clamp-2 w-full text-xs font-semibold leading-tight">
+          {habit.name}
+        </span>
       </button>
 
-      <div className="mt-2 space-y-1.5">
-        <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+      <div className="mt-2.5 space-y-2">
+        <div className="h-2 overflow-hidden rounded-full bg-muted">
           <div
-            className="h-full rounded-full transition-all duration-300"
+            className="h-full rounded-full transition-all duration-300 ease-out"
             style={{
               width: `${Math.min(100, barPercent)}%`,
               backgroundColor: accentColor,
@@ -81,7 +83,7 @@ export function HabitCompactTile({
         <div className="flex items-center justify-between text-[10px] text-muted-foreground">
           <span>{progressLabel}</span>
           {streak > 0 && (
-            <span className="inline-flex items-center gap-0.5 font-medium text-foreground/80">
+            <span className="inline-flex items-center gap-0.5 font-semibold text-foreground/80">
               <Flame className="size-3 text-orange-500" aria-hidden />
               {streak}
             </span>
@@ -96,13 +98,20 @@ export function HabitCompactTile({
           onToggleToday();
         }}
         className={cn(
-          'mt-2 w-full rounded-xl py-1.5 text-[11px] font-medium transition-colors',
+          'mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl py-2 text-[11px] font-semibold transition-all duration-200',
           habit.completedToday
             ? 'bg-decisions/15 text-decisions'
-            : 'bg-muted text-muted-foreground hover:bg-muted/80',
+            : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary'
         )}
       >
-        {habit.completedToday ? 'Done today' : 'Check in'}
+        {habit.completedToday ? (
+          <>
+            <Check className="size-3" />
+            Done
+          </>
+        ) : (
+          'Check in'
+        )}
       </button>
     </article>
   );

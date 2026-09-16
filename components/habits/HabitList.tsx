@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Target } from 'lucide-react';
 import { AddHabitModal } from '@/components/habits/AddHabitModal';
 import { HabitCompactTile } from '@/components/habits/HabitCompactTile';
 import { HabitDetailPanel } from '@/components/habits/HabitDetailPanel';
@@ -33,18 +33,18 @@ export function HabitList() {
       <HabitsTodayBanner habits={habits} />
 
       {habits.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-black/[0.08] px-4 py-10 text-center">
-          <p className="text-3xl" aria-hidden>
-            🎯
-          </p>
-          <p className="mt-3 text-sm font-medium">Start a goal</p>
-          <p className="mt-1 text-[13px] text-muted-foreground">
-            Add habits as boxes at the top — tap an emoji for streaks, heatmaps, and smart progress.
+        <div className="empty-state">
+          <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-primary/10">
+            <Target className="size-8 text-primary" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground">Start a goal</h3>
+          <p className="mx-auto mt-2 max-w-xs text-sm text-muted-foreground">
+            Add habits as tiles at the top. Tap the emoji to see streaks, heatmaps, and smart progress.
           </p>
         </div>
       ) : (
-        <section aria-label="Your habits" className="flex flex-col gap-3">
-          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-1 pt-0.5">
+        <section aria-label="Your habits" className="flex flex-col gap-4">
+          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-2 pt-0.5">
             {habits.map((habit, index) => (
               <HabitCompactTile
                 key={habit.id}
@@ -58,9 +58,9 @@ export function HabitList() {
             <button
               type="button"
               onClick={() => setModalOpen(true)}
-              className="flex w-[7.5rem] shrink-0 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-black/[0.12] bg-card/50 p-3 text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
+              className="flex w-[7.5rem] shrink-0 flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border/60 bg-card/50 p-3 text-muted-foreground transition-all duration-200 hover:border-primary/50 hover:bg-primary/5 hover:text-primary"
             >
-              <span className="flex size-14 items-center justify-center rounded-2xl border border-dashed border-current/30">
+              <span className="flex size-14 items-center justify-center rounded-2xl border-2 border-dashed border-current/30 transition-transform duration-200 group-hover:scale-105">
                 <Plus className="size-6" aria-hidden />
               </span>
               <span className="text-xs font-medium">Add habit</span>
@@ -77,8 +77,8 @@ export function HabitList() {
               />
             </div>
           ) : (
-            <p className="px-0.5 text-[11px] text-muted-foreground">
-              Tap an emoji to see the breakdown below · Check in from the tile or in details
+            <p className="px-0.5 text-center text-xs text-muted-foreground">
+              Tap an emoji to see the breakdown below
             </p>
           )}
         </section>
@@ -88,7 +88,7 @@ export function HabitList() {
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="h-11 w-full rounded-xl border border-dashed border-black/[0.12] text-sm font-medium text-primary hover:bg-primary/5"
+          className="h-12 w-full rounded-2xl border-2 border-dashed border-border/60 text-sm font-semibold text-primary transition-all duration-200 hover:border-primary/50 hover:bg-primary/5"
         >
           + Add your first habit
         </button>

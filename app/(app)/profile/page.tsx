@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { AppearanceSettings } from '@/components/profile/AppearanceSettings';
 import { detectBrowserTimezone } from '@/lib/timezone';
 
 export default function ProfilePage() {
@@ -10,8 +11,11 @@ export default function ProfilePage() {
     <main className="mx-auto flex w-full max-w-lg flex-col gap-4 p-4">
       <header className="px-0.5">
         <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
-        <p className="mt-0.5 text-[15px] text-muted-foreground">Settings</p>
+        <p className="mt-0.5 text-[15px] text-muted-foreground">Settings &amp; preferences</p>
       </header>
+
+      {/* Appearance Settings - new section */}
+      <AppearanceSettings />
 
       <Card>
         <CardHeader>

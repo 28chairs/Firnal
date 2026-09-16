@@ -21,14 +21,14 @@ export function SearchBar({ onChange, autoFocus = false }: SearchBarProps) {
   return (
     <div className="relative">
       <Search
-        className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+        className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-muted-foreground"
         aria-hidden
       />
       <Input
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
         placeholder="Search your journal…"
-        className="h-11 rounded-xl pl-10 pr-10"
+        className="h-12 rounded-2xl border-2 border-border/60 bg-card pl-12 pr-12 text-base shadow-[0_2px_8px_rgba(0,0,0,0.03)] transition-all duration-200 focus:border-primary/50 focus:shadow-[0_4px_12px_rgba(0,0,0,0.06)]"
         autoFocus={autoFocus}
         aria-label="Search journal"
       />
@@ -37,7 +37,7 @@ export function SearchBar({ onChange, autoFocus = false }: SearchBarProps) {
           type="button"
           variant="ghost"
           size="icon"
-          className="absolute right-1 top-1/2 size-8 -translate-y-1/2"
+          className="absolute right-2 top-1/2 size-8 -translate-y-1/2 rounded-xl transition-colors hover:bg-muted"
           onClick={() => {
             setDraft('');
             onChange('');
