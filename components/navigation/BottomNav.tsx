@@ -31,10 +31,10 @@ export function BottomNav({
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/50 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-1px_20px_rgba(0,0,0,0.05)] backdrop-blur-xl transition-colors duration-200"
+      className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/50 bg-card/95 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-1px_20px_rgba(0,0,0,0.05)] backdrop-blur-xl transition-colors duration-200"
       aria-label="Main navigation"
     >
-      <div className="mx-auto flex h-[var(--spacing-nav-height,4rem)] max-w-lg items-end justify-between px-2">
+      <div className="mx-auto flex h-[var(--spacing-nav-height,4.25rem)] max-w-lg items-end justify-between px-2">
         {tabs.slice(0, 2).map(({ href, label, icon: Icon }) => (
           <TabLink
             key={href}
