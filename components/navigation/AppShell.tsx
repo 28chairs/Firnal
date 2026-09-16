@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { BottomNav } from '@/components/navigation/BottomNav';
+import { seedThreeSampleDays, shouldAutoSeedSamples } from '@/lib/sample-data';
 import { RecordingOverlay } from '@/components/navigation/RecordingOverlay';
 import { useMediaRecorder } from '@/hooks/useMediaRecorder';
 import { uploadCapture } from '@/lib/api/uploadCapture';
@@ -163,6 +164,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [beginRecording, endRecording]);
 
   useEffect(() => {
+    if (shouldAutoSeedSamples()) {
+      seedThreeSampleDays();
+    }
+  }, []);
+
+  useEffect(() => {
     if (!overlayOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -173,7 +180,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className="flex min-h-screen flex-col pb-20">{children}</div>
+      <div className="flex min-h-dvh flex-col pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-[env(safe-area-inset-top)]">{children}</div>
       <BottomNav
         onFabPointerDown={handleFabPointerDown}
         onFabPointerUp={handleFabPointerUp}
