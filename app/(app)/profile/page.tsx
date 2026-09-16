@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { AppearanceSettings } from '@/components/profile/AppearanceSettings';
 import { GoogleCalendarConnect } from '@/components/profile/GoogleCalendarConnect';
 import { detectBrowserTimezone } from '@/lib/timezone';
+import { SampleDaysCard } from '@/components/profile/SampleDaysCard';
 
 function GoogleCalendarConnectFallback() {
   return (
@@ -33,6 +34,8 @@ export default function ProfilePage() {
       </header>
 
       <AppearanceSettings />
+
+      <SampleDaysCard />
 
       <Suspense fallback={<GoogleCalendarConnectFallback />}>
         <GoogleCalendarConnect />
