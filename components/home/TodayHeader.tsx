@@ -1,35 +1,26 @@
 'use client';
 
 import Link from 'next/link';
-import { Search, Sparkles } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { formatInTimeZone } from 'date-fns-tz';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { detectBrowserTimezone, getTodayDateString } from '@/lib/timezone';
+import { detectBrowserTimezone } from '@/lib/timezone';
 
 export function TodayHeader() {
   const timezone = detectBrowserTimezone();
-  const today = getTodayDateString(timezone);
-  const label = formatInTimeZone(new Date(), timezone, 'EEEE, MMM d');
+  const label = formatInTimeZone(new Date(), timezone, 'EEEE, MMMM d');
 
   return (
-    <header className="flex items-start justify-between gap-3 px-0.5">
-      <div>
-        <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">{label}</h1>
-          <Sparkles className="size-5 text-primary" aria-hidden />
-        </div>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Your daily journal · {today}
-        </p>
-      </div>
+    <header className="flex items-center justify-between gap-3">
+      <h1 className="text-xl font-semibold tracking-tight text-foreground">{label}</h1>
       <Link
         href="/search"
         className={cn(
           buttonVariants({ variant: 'ghost', size: 'icon' }),
-          'size-11 shrink-0 rounded-xl transition-all duration-200 hover:bg-primary/10 hover:text-primary'
+          'size-10 shrink-0 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground'
         )}
-        aria-label="Search journal"
+        aria-label="Search"
       >
         <Search className="size-5" />
       </Link>
