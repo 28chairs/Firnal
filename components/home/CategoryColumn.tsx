@@ -64,9 +64,16 @@ type CategoryGridProps = {
   breakdown: DailyFlowchart;
   columnRefs?: Partial<Record<CategoryKey, (el: HTMLElement | null) => void>>;
   className?: string;
+  /** When true, skip categories with no items (Murmur-style). */
+  hideEmpty?: boolean;
 };
 
-export function CategoryGrid({ breakdown, columnRefs, className }: CategoryGridProps) {
+export function CategoryGrid({
+  breakdown,
+  columnRefs,
+  className,
+  hideEmpty = true,
+}: CategoryGridProps) {
   const categories: CategoryKey[] = [
     'commitments',
     'decisions',
@@ -75,6 +82,18 @@ export function CategoryGrid({ breakdown, columnRefs, className }: CategoryGridP
     'questions',
   ];
 
+  const visible = hideEmpty
+    ? categories.filter((category) => getCategoryItems(category, breakdown).length > 0)
+    : categories;
+
+  if (visible.length === 0) {
+    return (
+      <p className="rounded-2xl border border-dashed border-border/70 px-4 py-6 text-center text-sm text-muted-foreground">
+        Categories will appear after your next voice note.
+      </p>
+    );
+  }
+
   return (
     <div
       className={cn(
@@ -82,7 +101,7 @@ export function CategoryGrid({ breakdown, columnRefs, className }: CategoryGridP
         className,
       )}
     >
-      {categories.map((category) => (
+      {visible.map((category) => (
         <CategoryColumn
           key={category}
           category={category}
