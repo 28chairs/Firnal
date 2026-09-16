@@ -70,9 +70,9 @@ export function RecordingOverlay({
               <p className="font-mono text-4xl font-medium tabular-nums tracking-tight text-foreground">
                 {elapsedLabel}
               </p>
-              <p className="text-center text-sm font-medium text-muted-foreground">
+              <p className="text-center text-sm text-muted-foreground">
                 {isUploading
-                  ? 'Processing your note…'
+                  ? 'Processing…'
                   : isRecording
                     ? 'Release to stop'
                     : 'Hold to record'}
@@ -82,7 +82,7 @@ export function RecordingOverlay({
             {isUploading && (
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="size-1.5 rounded-full bg-fab animate-pulse" />
-                <span>Uploading and transcribing</span>
+                <span>Saving your recording</span>
               </div>
             )}
           </>
