@@ -34,12 +34,11 @@ export function HabitList() {
 
       {habits.length === 0 ? (
         <div className="empty-state">
-          <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-primary/10">
-            <Target className="size-8 text-primary" />
+          <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/10">
+            <Target className="size-7 text-primary" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground">Start a goal</h3>
-          <p className="mx-auto mt-2 max-w-xs text-sm text-muted-foreground">
-            Add habits and check them off — or mention them in your recordings and AI will mark them done.
+          <p className="text-sm text-muted-foreground">
+            Add a habit below — mention it in recordings and AI marks it done.
           </p>
         </div>
       ) : (

@@ -130,20 +130,12 @@ export function DayFlowchart({ date }: { date?: string }) {
 function EmptyFlowchart() {
   return (
     <div className="empty-state">
-      <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-primary/10">
-        <Mic className="size-8 text-primary" />
+      <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/10">
+        <Mic className="size-7 text-primary" />
       </div>
-      <h3 className="text-lg font-semibold text-foreground">Start your day</h3>
-      <p className="mx-auto mt-2 max-w-xs text-sm text-muted-foreground">
-        Hold the mic button and tell me about your day. AI will organize your thoughts into a visual
-        flowchart.
+      <p className="text-sm text-muted-foreground">
+        Hold the mic and talk — your day becomes a flowchart.
       </p>
-      <div className="mx-auto mt-4 flex items-center gap-2 text-xs text-muted-foreground">
-        <kbd className="rounded-md border border-border bg-muted px-2 py-0.5 font-mono text-[10px]">
-          Space
-        </kbd>
-        <span>or tap the mic button</span>
-      </div>
     </div>
   );
 }
