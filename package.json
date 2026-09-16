@@ -19,6 +19,7 @@
     "@capacitor/ios": "^8.5.2",
     "@capacitor/splash-screen": "^8.0.2",
     "@capacitor/status-bar": "^8.0.3",
+    "@independo/capacitor-voice-recorder": "^8.3.9",
     "@supabase/ssr": "^0.12.6",
     "@supabase/supabase-js": "^2.115.0",
     "class-variance-authority": "^0.7.1",
