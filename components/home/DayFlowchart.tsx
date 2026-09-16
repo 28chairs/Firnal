@@ -40,17 +40,10 @@ export function DayFlowchart({ date }: { date?: string }) {
 
   if (error && !breakdown) {
     return (
-      <div className="rounded-3xl border border-destructive/20 bg-destructive/5 p-6 text-center">
-        <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-2xl bg-destructive/10">
-          <RefreshCw className="size-6 text-destructive" />
-        </div>
-        <p className="text-sm font-medium text-destructive">{error}</p>
-        <Button
-          variant="outline"
-          size="sm"
-          className="mt-4"
-          onClick={retry}
-        >
+      <div className="empty-state">
+        <p className="text-sm text-muted-foreground">{error}</p>
+        <Button variant="ghost" size="sm" className="mt-3" onClick={retry}>
+          <RefreshCw className="mr-1.5 size-3.5" />
           Try again
         </Button>
       </div>
@@ -111,8 +104,8 @@ export function DayFlowchart({ date }: { date?: string }) {
         </div>
       </div>
 
-      <p className="text-center text-xs text-muted-foreground">
-        AI sorted your thoughts into categories automatically
+      <p className="text-center text-xs text-muted-foreground/70">
+        Sorted by AI
       </p>
 
       {error && (
