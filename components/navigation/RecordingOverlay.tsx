@@ -61,9 +61,9 @@ export function RecordingOverlay({
               </p>
               <p className="mt-2 text-sm text-muted-foreground">
                 {status === 'uploading'
-                  ? 'Processing your recording…'
+                  ? 'Processing…'
                   : status === 'recording'
-                    ? 'Release to stop recording'
+                    ? 'Release to stop'
                     : 'Hold to record'}
               </p>
             </div>
@@ -71,7 +71,7 @@ export function RecordingOverlay({
             {status === 'uploading' && (
               <div className="flex items-center gap-2">
                 <div className="size-2 animate-pulse rounded-full bg-primary" />
-                <span className="text-xs text-muted-foreground">Transcribing with AI</span>
+                <span className="text-xs text-muted-foreground">Saving your recording</span>
               </div>
             )}
           </>
