@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   getGoogleConnectionState,
+  getGoogleConnectionServerSnapshot,
   setGoogleConnected,
   setGoogleDisconnected,
   subscribeToGoogleConnection,
@@ -49,10 +50,11 @@ function reducer(state: State, action: Action): State {
 }
 
 function useGoogleConnectionStore() {
-  const getSnapshot = useCallback(() => getGoogleConnectionState(), []);
-  const getServerSnapshot = useCallback(() => ({ connected: false, email: undefined, connectedAt: undefined }), []);
-
-  return useSyncExternalStore(subscribeToGoogleConnection, getSnapshot, getServerSnapshot);
+  return useSyncExternalStore(
+    subscribeToGoogleConnection,
+    getGoogleConnectionState,
+    getGoogleConnectionServerSnapshot,
+  );
 }
 
 function getErrorMessage(error: string): string {
