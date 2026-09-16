@@ -40,3 +40,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Generated service worker (rebuild on deploy)
+public/sw.js
+public/swe-worker-*.js
