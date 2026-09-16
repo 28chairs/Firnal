@@ -39,7 +39,7 @@ export function HabitList() {
           </div>
           <h3 className="text-lg font-semibold text-foreground">Start a goal</h3>
           <p className="mx-auto mt-2 max-w-xs text-sm text-muted-foreground">
-            Add habits as tiles at the top. Tap the emoji to see streaks, heatmaps, and smart progress.
+            Add habits and check them off — or mention them in your recordings and AI will mark them done.
           </p>
         </div>
       ) : (
