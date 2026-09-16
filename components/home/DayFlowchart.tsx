@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Sparkles, RefreshCw, Mic } from 'lucide-react';
 import { CategoryGrid } from '@/components/home/CategoryColumn';
@@ -27,12 +27,22 @@ export function DayFlowchart({ date }: { date?: string }) {
     {}
   );
 
-  const setColumnRef = (category: CategoryKey) => (el: HTMLElement | null) => {
-    setColumnRefs((prev) => {
-      if (prev[category] === el) return prev;
-      return { ...prev, [category]: el };
-    });
-  };
+  // Stable ref callbacks — recreating these each render caused infinite setState loops.
+  const setCommitmentsRef = useCallback((el: HTMLElement | null) => {
+    setColumnRefs((prev) => (prev.commitments === el ? prev : { ...prev, commitments: el }));
+  }, []);
+  const setDecisionsRef = useCallback((el: HTMLElement | null) => {
+    setColumnRefs((prev) => (prev.decisions === el ? prev : { ...prev, decisions: el }));
+  }, []);
+  const setIdeasRef = useCallback((el: HTMLElement | null) => {
+    setColumnRefs((prev) => (prev.ideas === el ? prev : { ...prev, ideas: el }));
+  }, []);
+  const setPeopleRef = useCallback((el: HTMLElement | null) => {
+    setColumnRefs((prev) => (prev.people === el ? prev : { ...prev, people: el }));
+  }, []);
+  const setQuestionsRef = useCallback((el: HTMLElement | null) => {
+    setColumnRefs((prev) => (prev.questions === el ? prev : { ...prev, questions: el }));
+  }, []);
 
   if (generating && !breakdown) {
     return <FlowchartSkeleton />;
@@ -94,11 +104,11 @@ export function DayFlowchart({ date }: { date?: string }) {
           <CategoryGrid
             breakdown={breakdown}
             columnRefs={{
-              commitments: setColumnRef('commitments'),
-              decisions: setColumnRef('decisions'),
-              ideas: setColumnRef('ideas'),
-              people: setColumnRef('people'),
-              questions: setColumnRef('questions'),
+              commitments: setCommitmentsRef,
+              decisions: setDecisionsRef,
+              ideas: setIdeasRef,
+              people: setPeopleRef,
+              questions: setQuestionsRef,
             }}
           />
         </div>
