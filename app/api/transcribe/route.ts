@@ -101,14 +101,11 @@ async function transcribeLocalOnly({
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Transcription failed';
     const isNoSpeech = message.toLowerCase().includes('no speech');
-    const isApiKeyIssue =
-      message.toLowerCase().includes('openai') ||
-      message.toLowerCase().includes('api key') ||
-      message.toLowerCase().includes('401');
+    const isApiKeyMissing = message.toLowerCase().includes('openai_api_key');
 
-    if (isApiKeyIssue) {
+    if (isApiKeyMissing) {
       return NextResponse.json(
-        { error: 'OpenAI API key is not configured or invalid. Check your OPENAI_API_KEY.' },
+        { error: 'OPENAI_API_KEY is not configured. Please add it to your .env.local file.' },
         { status: 503 }
       );
     }
@@ -189,24 +186,19 @@ async function transcribeWithDatabase({
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Transcription failed';
     const isNoSpeech = message.toLowerCase().includes('no speech');
-    const isApiKeyIssue =
-      message.toLowerCase().includes('openai') ||
-      message.toLowerCase().includes('api key') ||
-      message.toLowerCase().includes('401');
+    const isApiKeyMissing = message.toLowerCase().includes('openai_api_key');
 
     await supabase
       .from('voice_entries')
       .update({
         status: 'failed',
-        error_message: isApiKeyIssue
-          ? 'OpenAI API key is not configured or invalid'
-          : message,
+        error_message: message,
       })
       .eq('id', entry.id);
 
-    if (isApiKeyIssue) {
+    if (isApiKeyMissing) {
       return NextResponse.json(
-        { error: 'OpenAI API key is not configured or invalid. Check your OPENAI_API_KEY.' },
+        { error: 'OPENAI_API_KEY is not configured. Please add it to your .env.local file.' },
         { status: 503 }
       );
     }
