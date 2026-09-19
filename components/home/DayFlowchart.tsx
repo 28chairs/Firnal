@@ -7,6 +7,7 @@ import { CategoryGrid } from '@/components/home/CategoryColumn';
 import { ConnectorLines } from '@/components/home/ConnectorLines';
 import { DayTimeline } from '@/components/home/DayTimeline';
 import { TranscriptPanel, type SpanRefMap } from '@/components/home/TranscriptPanel';
+import { AIPaywall, useAIAccess } from '@/components/billing/AIGate';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useDayJournal } from '@/hooks/useDayJournal';
@@ -20,6 +21,7 @@ export function DayFlowchart({ date }: { date?: string }) {
   const resolvedDate = date ?? getTodayDateString(timezone);
   const { breakdown, generatedAt, error, generating, retry } = useDayJournal(resolvedDate);
   const { events, connected, loading: eventsLoading } = useTodayEvents();
+  const { hasAccess } = useAIAccess();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const spanRefsRef = useRef<SpanRefMap>(new Map());
@@ -50,12 +52,22 @@ export function DayFlowchart({ date }: { date?: string }) {
   }, []);
 
   const isOfflineError = error === OFFLINE_ERROR || error === 'offline';
+  const isQuotaError = error?.includes('quota') || error?.includes('Upgrade');
 
   if (generating && !breakdown) {
     return <FlowchartSkeleton />;
   }
 
+  if (error && !breakdown) {
+    if (isQuotaError || !hasAccess) {
+      return <AIPaywall />;
+    }
+  }
+
   if (!breakdown) {
+    if (!hasAccess) {
+      return <AIPaywall />;
+    }
     return <CalmEmptyCard isOffline={isOfflineError && !!error} />;
   }
 
@@ -141,7 +153,7 @@ export function DayFlowchart({ date }: { date?: string }) {
         </div>
       </div>
 
-      {error && !isOfflineError && (
+      {error && !isOfflineError && !isQuotaError && (
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <span>Couldn&apos;t refresh your day map</span>
           <Button variant="ghost" size="sm" onClick={retry}>

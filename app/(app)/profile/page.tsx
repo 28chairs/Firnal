@@ -4,9 +4,10 @@ import { Suspense } from 'react';
 import { Globe, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AppearanceSettings } from '@/components/profile/AppearanceSettings';
+import { BillingStatus } from '@/components/billing/BillingStatus';
 import { GoogleCalendarConnect } from '@/components/profile/GoogleCalendarConnect';
-import { detectBrowserTimezone } from '@/lib/timezone';
 import { SampleDaysCard } from '@/components/profile/SampleDaysCard';
+import { detectBrowserTimezone } from '@/lib/timezone';
 
 function GoogleCalendarConnectFallback() {
   return (
@@ -32,6 +33,10 @@ export default function ProfilePage() {
         <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
         <p className="mt-0.5 text-[15px] text-muted-foreground">Settings &amp; preferences</p>
       </header>
+
+      <Suspense fallback={<Card><CardContent className="py-4 text-sm text-muted-foreground">Loading billing...</CardContent></Card>}>
+        <BillingStatus />
+      </Suspense>
 
       <AppearanceSettings />
 
