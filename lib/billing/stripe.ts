@@ -29,12 +29,20 @@ export interface CheckoutParams {
   successUrl: string;
   cancelUrl: string;
   mode: 'subscription' | 'payment';
+  planType: string;
+  metadata?: Record<string, string>;
 }
 
 export async function createCheckoutSession(
   params: CheckoutParams
 ): Promise<Stripe.Checkout.Session> {
   const stripe = getStripe();
+
+  const metadata: Record<string, string> = {
+    source: 'firnal-pwa',
+    plan_type: params.planType,
+    ...params.metadata,
+  };
 
   const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: params.mode,
@@ -46,6 +54,7 @@ export async function createCheckoutSession(
     ],
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,
+    metadata,
   };
 
   if (params.email) {
@@ -54,17 +63,13 @@ export async function createCheckoutSession(
 
   if (params.mode === 'subscription') {
     sessionParams.subscription_data = {
-      metadata: {
-        source: 'firnal-pwa',
-      },
+      metadata,
     };
   }
 
   if (params.mode === 'payment') {
     sessionParams.payment_intent_data = {
-      metadata: {
-        source: 'firnal-pwa',
-      },
+      metadata,
     };
   }
 

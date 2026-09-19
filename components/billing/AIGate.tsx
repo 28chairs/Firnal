@@ -1,17 +1,16 @@
 'use client';
 
-import { useSyncExternalStore } from 'react';
-import { useRouter } from 'next/navigation';
-import { Sparkles, Lock } from 'lucide-react';
+import { useState, useSyncExternalStore } from 'react';
+import { Mic, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   BILLING_CHANGED_EVENT,
   getBillingState,
-  getAIQuotaRemaining,
+  getFreeQuotaRemaining,
   type BillingState,
 } from '@/lib/billing/entitlements';
-import { FREE_AI_QUOTA, isUnlimitedPlan } from '@/lib/billing/plans';
+import { FREE_AI_MAPS_PER_WEEK, isPaidPlan } from '@/lib/billing/plans';
+import { UpgradeSheet } from './UpgradeSheet';
 
 function subscribeBilling(onStoreChange: () => void) {
   window.addEventListener(BILLING_CHANGED_EVENT, onStoreChange);
@@ -21,14 +20,14 @@ function subscribeBilling(onStoreChange: () => void) {
 function getClientSnapshot(): { billing: BillingState; quotaRemaining: number } {
   return {
     billing: getBillingState(),
-    quotaRemaining: getAIQuotaRemaining(),
+    quotaRemaining: getFreeQuotaRemaining(),
   };
 }
 
 function getServerSnapshot(): { billing: BillingState; quotaRemaining: number } {
   return {
     billing: { plan: 'free', email: null, stripeCustomerId: null, updatedAt: null },
-    quotaRemaining: FREE_AI_QUOTA,
+    quotaRemaining: FREE_AI_MAPS_PER_WEEK,
   };
 }
 
@@ -44,42 +43,79 @@ export function AIGate({ children, feature = 'AI day-map' }: AIGateProps) {
     getServerSnapshot
   );
 
-  const hasAccess = isUnlimitedPlan(billing.plan) || quotaRemaining > 0;
+  const hasAccess = isPaidPlan(billing.plan) || quotaRemaining > 0;
 
   if (hasAccess) {
     return <>{children}</>;
   }
 
-  return <AIPaywall feature={feature} />;
+  return <AIPaywall feature={feature} currentPlan={billing.plan} />;
 }
 
 interface AIPaywallProps {
-  feature: string;
+  feature?: string;
+  currentPlan?: 'free' | 'plus' | 'founding' | 'lifetime';
 }
 
-export function AIPaywall({ feature }: AIPaywallProps) {
-  const router = useRouter();
+export function AIPaywall({ currentPlan = 'free' }: AIPaywallProps) {
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   return (
-    <Card className="border-dashed border-primary/30 bg-primary/5">
-      <CardHeader className="items-center text-center">
-        <div className="mb-2 flex size-12 items-center justify-center rounded-full bg-primary/10">
-          <Lock className="size-6 text-primary" />
+    <>
+      <div className="flex flex-1 flex-col items-center justify-center">
+        <div className="calm-empty-card">
+          <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-primary/10">
+            <Mic className="size-8 text-primary" />
+          </div>
+          <h3 className="text-lg font-semibold tracking-tight text-foreground">
+            Hold the mic to start your day
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Your voice note turns into today&apos;s map — Commitments, Decisions,
+            Ideas, People, Questions.
+          </p>
+          <button
+            onClick={() => setSheetOpen(true)}
+            className="mt-4 text-sm font-medium text-primary hover:underline"
+          >
+            Get Plus for AI maps
+          </button>
         </div>
-        <CardTitle className="text-base">Weekly AI quota reached</CardTitle>
-        <CardDescription className="max-w-xs">
-          You&apos;ve used your {FREE_AI_QUOTA} free {feature}s this week. Upgrade to Plus for
-          unlimited AI features.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col items-center gap-3">
-        <Button onClick={() => router.push('/profile')} className="gap-2">
-          <Sparkles className="size-4" />
-          Upgrade to Plus
-        </Button>
-        <p className="text-xs text-muted-foreground">Starting at $9.99/month</p>
-      </CardContent>
-    </Card>
+      </div>
+
+      <UpgradeSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        currentPlan={currentPlan}
+      />
+    </>
+  );
+}
+
+export function UpgradeButton() {
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const { billing } = useSyncExternalStore(
+    subscribeBilling,
+    getClientSnapshot,
+    getServerSnapshot
+  );
+
+  if (isPaidPlan(billing.plan)) {
+    return null;
+  }
+
+  return (
+    <>
+      <Button onClick={() => setSheetOpen(true)} size="sm" className="gap-1.5">
+        <Sparkles className="size-3.5" />
+        Upgrade
+      </Button>
+      <UpgradeSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        currentPlan={billing.plan}
+      />
+    </>
   );
 }
 
@@ -92,8 +128,8 @@ export function useAIAccess() {
 
   return {
     plan: billing.plan,
-    hasAccess: isUnlimitedPlan(billing.plan) || quotaRemaining > 0,
+    hasAccess: isPaidPlan(billing.plan) || quotaRemaining > 0,
     quotaRemaining,
-    isUnlimited: isUnlimitedPlan(billing.plan),
+    isUnlimited: isPaidPlan(billing.plan),
   };
 }

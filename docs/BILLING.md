@@ -12,10 +12,19 @@ Firnal uses Stripe for subscription billing. This guide explains how to set up S
 | **Founding Annual** | $49/yr | Subscription | `STRIPE_PRICE_FOUNDING_YEARLY` |
 | **Lifetime** | $179 once | One-time | `STRIPE_PRICE_LIFETIME` |
 
+### Quota Limits (Warren)
+
+| Plan | Weekly Limit | Monthly Limit | Notes |
+|------|--------------|---------------|-------|
+| **Free** | 2 AI maps | — | Hard gate after 2/week |
+| **Plus** | — | 60 AI maps | Soft cap (throttle, don't hard-fail) |
+| **Founding** | — | 60 AI maps | Inherits Plus caps |
+| **Lifetime** | — | 60 AI maps | 100 seats max, fair-use AI |
+
 ### Plan Rules
 
 - **Free**: Local voice capture works, AI day-map limited to 2/week
-- **Plus/Founding/Lifetime**: Unlimited AI day-maps, habits-from-voice detection, calendar AI
+- **Plus/Founding/Lifetime**: 60 AI day-maps/month (soft cap), habits-from-voice detection, calendar AI
 
 ## Stripe Dashboard Setup
 
@@ -128,12 +137,34 @@ Plan state is stored in `localStorage` (key: `firnal:billing-plan`) until Phase 
 }
 ```
 
-AI quota is tracked in `localStorage` (key: `firnal:ai-quota`):
+Weekly quota for free users (key: `firnal:ai-quota-weekly`):
 
 ```typescript
 {
   weekStart: string, // ISO date of Monday
   used: number       // 0-2 for free tier
+}
+```
+
+Monthly quota for paid users (key: `firnal:ai-quota-monthly`):
+
+```typescript
+{
+  monthStart: string, // ISO date (YYYY-MM-01)
+  used: number        // 0-60 for Plus/Founding/Lifetime
+}
+```
+
+### Stripe Metadata
+
+Checkout sessions include quota metadata for backend tracking:
+
+```typescript
+{
+  source: 'firnal-pwa',
+  plan_type: 'plus' | 'founding' | 'lifetime',
+  ai_maps_per_month: '60',
+  lifetime_seat_cap: '100' // lifetime only
 }
 ```
 

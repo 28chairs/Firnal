@@ -3,23 +3,24 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Sparkles, Crown, Star, CheckCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { UpgradeSection } from './PlanCard';
+import { UpgradeSheet } from './UpgradeSheet';
 import {
   BILLING_CHANGED_EVENT,
   getBillingState,
-  getQuotaState,
+  getWeeklyQuotaState,
   upgradeToPlan,
   type BillingState,
-  type QuotaState,
+  type WeeklyQuotaState,
 } from '@/lib/billing/entitlements';
-import { FREE_AI_QUOTA, PLANS, type PlanType } from '@/lib/billing/plans';
+import { FREE_AI_MAPS_PER_WEEK, PLANS, type PlanType } from '@/lib/billing/plans';
 
 const PLAN_ICONS: Record<PlanType, React.ReactNode> = {
   free: null,
-  plus: <Sparkles className="size-5 text-blue-500" />,
-  founding: <Crown className="size-5 text-amber-500" />,
-  lifetime: <Star className="size-5 text-purple-500" />,
+  plus: <Sparkles className="size-5 text-primary" />,
+  founding: <Crown className="size-5 text-primary" />,
+  lifetime: <Star className="size-5 text-primary" />,
 };
 
 function subscribeBilling(onStoreChange: () => void) {
@@ -35,11 +36,11 @@ function getServerBillingSnapshot(): BillingState {
   return { plan: 'free', email: null, stripeCustomerId: null, updatedAt: null };
 }
 
-function getClientQuotaSnapshot(): QuotaState {
-  return getQuotaState();
+function getClientQuotaSnapshot(): WeeklyQuotaState {
+  return getWeeklyQuotaState();
 }
 
-function getServerQuotaSnapshot(): QuotaState {
+function getServerQuotaSnapshot(): WeeklyQuotaState {
   return { weekStart: '', used: 0 };
 }
 
@@ -47,6 +48,7 @@ export function BillingStatus() {
   const searchParams = useSearchParams();
   const [verifying, setVerifying] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const verifyingRef = useRef(false);
 
   const billing = useSyncExternalStore(
@@ -98,7 +100,7 @@ export function BillingStatus() {
   }, [searchParams]);
 
   const quotaUsed = quota.used;
-  const quotaRemaining = Math.max(0, FREE_AI_QUOTA - quotaUsed);
+  const quotaRemaining = Math.max(0, FREE_AI_MAPS_PER_WEEK - quotaUsed);
 
   return (
     <div className="flex flex-col gap-4">
@@ -137,7 +139,7 @@ export function BillingStatus() {
               {billing.plan === 'lifetime'
                 ? 'Lifetime access with fair-use AI.'
                 : billing.plan === 'founding'
-                  ? 'Founding annual rate locked in forever.'
+                  ? 'Founding annual rate — $49/yr for 30 days, then $79/yr.'
                   : 'Full access to AI day-maps, habits detection, and calendar AI.'}
             </p>
           </CardContent>
@@ -145,21 +147,39 @@ export function BillingStatus() {
       )}
 
       {billing.plan === 'free' && (
-        <>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Subscription</CardTitle>
-              <CardDescription>Upgrade to unlock unlimited AI features</CardDescription>
-            </CardHeader>
-          </Card>
-
-          <UpgradeSection
-            currentPlan={billing.plan}
-            quotaUsed={quotaUsed}
-            quotaRemaining={quotaRemaining}
-          />
-        </>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Plan</CardTitle>
+            <CardDescription>
+              {quotaRemaining > 0
+                ? `${quotaRemaining} AI day-map${quotaRemaining === 1 ? '' : 's'} left this week`
+                : 'Weekly AI quota used — upgrade for more'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            <div className="flex gap-1">
+              {Array.from({ length: FREE_AI_MAPS_PER_WEEK }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-2 flex-1 rounded-full ${
+                    i < quotaUsed ? 'bg-primary' : 'bg-muted'
+                  }`}
+                />
+              ))}
+            </div>
+            <Button onClick={() => setSheetOpen(true)} className="w-full gap-2">
+              <Sparkles className="size-4" />
+              Upgrade to Plus
+            </Button>
+          </CardContent>
+        </Card>
       )}
+
+      <UpgradeSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        currentPlan={billing.plan}
+      />
     </div>
   );
 }

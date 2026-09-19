@@ -2,6 +2,11 @@ export type PlanType = 'free' | 'plus' | 'founding' | 'lifetime';
 
 export type BillingPeriod = 'monthly' | 'yearly' | 'once';
 
+export interface QuotaLimits {
+  aiMapsPerWeek: number | null;
+  aiMapsPerMonth: number | null;
+}
+
 export interface PlanConfig {
   id: PlanType;
   name: string;
@@ -10,10 +15,12 @@ export interface PlanConfig {
   priceId: string | null;
   description: string;
   features: string[];
-  aiMapsPerWeek: number | null;
+  quotas: QuotaLimits;
 }
 
-export const FREE_AI_QUOTA = 2;
+export const FREE_AI_MAPS_PER_WEEK = 2;
+export const PLUS_AI_MAPS_PER_MONTH = 60;
+export const LIFETIME_SEAT_CAP = 100;
 
 export const PLANS: Record<PlanType, PlanConfig> = {
   free: {
@@ -26,9 +33,12 @@ export const PLANS: Record<PlanType, PlanConfig> = {
     features: [
       'Hold-to-talk voice capture',
       'Local recording storage',
-      `${FREE_AI_QUOTA} AI day-maps per week`,
+      `${FREE_AI_MAPS_PER_WEEK} AI day-maps per week`,
     ],
-    aiMapsPerWeek: FREE_AI_QUOTA,
+    quotas: {
+      aiMapsPerWeek: FREE_AI_MAPS_PER_WEEK,
+      aiMapsPerMonth: null,
+    },
   },
   plus: {
     id: 'plus',
@@ -39,11 +49,14 @@ export const PLANS: Record<PlanType, PlanConfig> = {
     description: 'Full AI features',
     features: [
       'Everything in Free',
-      'Unlimited AI day-maps',
+      'AI day-maps',
       'Habits from voice detection',
       'Calendar AI features',
     ],
-    aiMapsPerWeek: null,
+    quotas: {
+      aiMapsPerWeek: null,
+      aiMapsPerMonth: PLUS_AI_MAPS_PER_MONTH,
+    },
   },
   founding: {
     id: 'founding',
@@ -51,13 +64,16 @@ export const PLANS: Record<PlanType, PlanConfig> = {
     price: 49,
     period: 'yearly',
     priceId: 'STRIPE_PRICE_FOUNDING_YEARLY',
-    description: 'Early supporter special — $49/yr for 30 days',
+    description: '$49/yr for 30 days only, then $79/yr',
     features: [
       'Everything in Plus',
-      'Locked at $49/yr forever',
+      '$49/yr rate (30 days only)',
       'Founding member badge',
     ],
-    aiMapsPerWeek: null,
+    quotas: {
+      aiMapsPerWeek: null,
+      aiMapsPerMonth: PLUS_AI_MAPS_PER_MONTH,
+    },
   },
   lifetime: {
     id: 'lifetime',
@@ -69,10 +85,13 @@ export const PLANS: Record<PlanType, PlanConfig> = {
     features: [
       'Everything in Plus',
       'One-time payment',
-      'Fair-use AI (not uncapped)',
-      'Limited to 100 seats',
+      'Fair-use AI',
+      `Limited to ${LIFETIME_SEAT_CAP} seats`,
     ],
-    aiMapsPerWeek: null,
+    quotas: {
+      aiMapsPerWeek: null,
+      aiMapsPerMonth: PLUS_AI_MAPS_PER_MONTH,
+    },
   },
 };
 
@@ -95,6 +114,25 @@ export function getPlanByPriceId(priceId: string): PlanConfig | null {
   return null;
 }
 
-export function isUnlimitedPlan(plan: PlanType): boolean {
+export function isPaidPlan(plan: PlanType): boolean {
   return plan === 'plus' || plan === 'founding' || plan === 'lifetime';
+}
+
+export function getStripeMetadata(plan: PlanType): Record<string, string> {
+  const config = PLANS[plan];
+  const metadata: Record<string, string> = {
+    plan_type: plan,
+  };
+
+  if (config.quotas.aiMapsPerWeek !== null) {
+    metadata.ai_maps_per_week = String(config.quotas.aiMapsPerWeek);
+  }
+  if (config.quotas.aiMapsPerMonth !== null) {
+    metadata.ai_maps_per_month = String(config.quotas.aiMapsPerMonth);
+  }
+  if (plan === 'lifetime') {
+    metadata.lifetime_seat_cap = String(LIFETIME_SEAT_CAP);
+  }
+
+  return metadata;
 }

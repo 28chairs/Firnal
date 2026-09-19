@@ -1,3 +1,4 @@
+import { QuotaBanner } from '@/components/billing/QuotaBanner';
 import { DayFlowchart } from '@/components/home/DayFlowchart';
 import { HabitReminders } from '@/components/home/HabitReminders';
 import { RecentRecordings } from '@/components/home/RecentRecordings';
@@ -14,6 +15,8 @@ export default function HomePage() {
 
       {/* Below-fold content: demoted and compact */}
       <section className="mt-4 flex flex-col gap-3">
+        <QuotaBanner />
+
         <HabitReminders />
 
         <details className="group rounded-2xl border border-border/60 bg-card/50">
