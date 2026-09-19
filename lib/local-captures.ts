@@ -131,6 +131,7 @@ export function addLocalCapture(entry: VoiceEntry) {
   const all = readAll();
   all.push(entry);
   writeAll(all);
+  notifyCapturesChanged();
 }
 
 export function updateLocalCapture(id: string, patch: Partial<VoiceEntry>) {
