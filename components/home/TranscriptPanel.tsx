@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { CATEGORIES, type CategoryKey } from '@/lib/categories';
 import type { TranscriptSpan } from '@/lib/schemas';
 
@@ -16,36 +17,40 @@ function categoryColor(category: CategoryKey) {
 }
 
 export function TranscriptPanel({ text, spans, spanRefsRef }: TranscriptPanelProps) {
-  const sorted = [...spans].sort((a, b) => a.start - b.start);
-  const nodes: React.ReactNode[] = [];
-  let cursor = 0;
+  const nodes = useMemo(() => {
+    const sorted = [...spans].sort((a, b) => a.start - b.start);
+    const result: React.ReactNode[] = [];
+    let cursor = 0;
 
-  sorted.forEach((span, index) => {
-    if (span.start > cursor) {
-      nodes.push(<span key={`t-${cursor}`}>{text.slice(cursor, span.start)}</span>);
+    sorted.forEach((span, index) => {
+      if (span.start > cursor) {
+        result.push(<span key={`t-${cursor}`}>{text.slice(cursor, span.start)}</span>);
+      }
+
+      const color = categoryColor(span.category);
+      result.push(
+        <mark
+          key={`s-${index}-${span.start}`}
+          ref={(el) => {
+            spanRefsRef?.current.set(index, el);
+          }}
+          data-category={span.category}
+          data-span-index={index}
+          className="rounded px-0.5 text-inherit"
+          style={{ backgroundColor: `${color}28` }}
+        >
+          {text.slice(span.start, span.end)}
+        </mark>
+      );
+      cursor = span.end;
+    });
+
+    if (cursor < text.length) {
+      result.push(<span key={`t-${cursor}`}>{text.slice(cursor)}</span>);
     }
 
-    const color = categoryColor(span.category);
-    nodes.push(
-      <mark
-        key={`s-${index}-${span.start}`}
-        ref={(el) => {
-          spanRefsRef?.current.set(index, el);
-        }}
-        data-category={span.category}
-        data-span-index={index}
-        className="rounded px-0.5 text-inherit"
-        style={{ backgroundColor: `${color}28` }}
-      >
-        {text.slice(span.start, span.end)}
-      </mark>,
-    );
-    cursor = span.end;
-  });
-
-  if (cursor < text.length) {
-    nodes.push(<span key={`t-${cursor}`}>{text.slice(cursor)}</span>);
-  }
+    return result;
+  }, [text, spans, spanRefsRef]);
 
   return (
     <div className="rounded-2xl border border-black/[0.04] bg-card p-4 shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
