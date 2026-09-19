@@ -160,7 +160,7 @@ export function DayFlowchart({ date }: { date?: string }) {
 
 function CalmEmptyCard({ isOffline = false }: { isOffline?: boolean }) {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-1 flex-col items-center justify-center">
       <div className="calm-empty-card">
         <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-primary/10">
           <Mic className="size-8 text-primary" />
