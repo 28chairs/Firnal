@@ -3,25 +3,11 @@ import { getServerEnv } from '@/lib/env';
 
 let client: OpenAI | null = null;
 
-const PLACEHOLDER_KEY_PATTERNS = [
-  /^sk-your-/i,
-  /^sk-[a-z]+-key$/i,
-  /^your-/i,
-  /placeholder/i,
-];
-
-function isPlaceholderKey(key: string): boolean {
-  return PLACEHOLDER_KEY_PATTERNS.some((pattern) => pattern.test(key));
-}
-
 export function getOpenAIClient(): OpenAI {
   if (!client) {
     const { OPENAI_API_KEY } = getServerEnv();
     if (!OPENAI_API_KEY) {
-      throw new Error('OpenAI API key not configured. Add OPENAI_API_KEY to your environment.');
-    }
-    if (isPlaceholderKey(OPENAI_API_KEY)) {
-      throw new Error('OpenAI API key is a placeholder. Replace it with a real key in your environment.');
+      throw new Error('OPENAI_API_KEY is not configured');
     }
     client = new OpenAI({ apiKey: OPENAI_API_KEY });
   }
