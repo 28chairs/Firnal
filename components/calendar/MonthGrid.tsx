@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { DayCell } from '@/components/calendar/DayCell';
 import { Button } from '@/components/ui/button';
 import { useCalendarMonth } from '@/hooks/useCalendarMonth';
@@ -78,10 +78,9 @@ export function MonthGrid() {
       </div>
 
       {!hasEntries && (
-        <div className="flex flex-col items-center gap-2 py-4 text-center">
-          <Calendar className="size-8 text-muted-foreground/50" />
-          <p className="text-sm text-muted-foreground">No entries this month</p>
-        </div>
+        <p className="py-4 text-center text-sm text-muted-foreground">
+          No recordings yet — hold the mic to start.
+        </p>
       )}
     </section>
   );

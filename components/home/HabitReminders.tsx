@@ -24,9 +24,9 @@ export function HabitReminders() {
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between px-0.5">
-        <h2 className="text-sm font-semibold text-muted-foreground">Today&apos;s habits</h2>
-        <span className="text-xs text-muted-foreground">
-          {completedCount}/{totalCount} done
+        <h2 className="text-sm font-medium text-muted-foreground">Habits</h2>
+        <span className="text-xs text-muted-foreground/80">
+          {completedCount}/{totalCount}
         </span>
       </div>
       <div className="-mx-1 flex gap-2.5 overflow-x-auto px-1 pb-1.5">
@@ -50,16 +50,14 @@ export function HabitReminders() {
             </span>
             <span className="font-medium">{habit.name}</span>
             {habit.completedToday && (
-              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1 text-xs">
                 {habit.todaySource === 'voice' ? (
-                  <>
+                  <span className="flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-primary">
                     <Mic2 className="size-3" />
-                    voice
-                  </>
+                    <span className="text-[10px] font-medium">voice</span>
+                  </span>
                 ) : (
-                  <>
-                    <CheckCircle2 className="size-3 text-decisions" />
-                  </>
+                  <CheckCircle2 className="size-3 text-decisions" />
                 )}
               </span>
             )}
