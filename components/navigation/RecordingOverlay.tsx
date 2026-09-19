@@ -25,7 +25,7 @@ export function RecordingOverlay({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-label="Recording"
@@ -70,9 +70,9 @@ export function RecordingOverlay({
               <p className="font-mono text-4xl font-medium tabular-nums tracking-tight text-foreground">
                 {elapsedLabel}
               </p>
-              <p className="text-center text-sm font-medium text-muted-foreground">
+              <p className="text-center text-sm text-muted-foreground">
                 {isUploading
-                  ? 'Processing your note…'
+                  ? 'Processing…'
                   : isRecording
                     ? 'Release to stop'
                     : 'Hold to record'}
@@ -82,7 +82,7 @@ export function RecordingOverlay({
             {isUploading && (
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="size-1.5 rounded-full bg-fab animate-pulse" />
-                <span>Uploading and transcribing</span>
+                <span>Saving your recording</span>
               </div>
             )}
           </>
@@ -99,53 +99,50 @@ function MicErrorPanel({
   error: MediaRecorderError;
   onClose: () => void;
 }) {
-  const isPermission = error === 'permission_denied';
+  const copy =
+    error === 'permission_denied'
+      ? {
+          title: 'Microphone access needed',
+          body: 'Allow microphone access for FIRNAL, then hold the button again.',
+          tips: [
+            'On iPhone: Settings → FIRNAL → Microphone → On',
+            'If you denied once, toggle Microphone off/on, then reopen FIRNAL.',
+          ],
+        }
+      : error === 'insecure_context'
+        ? {
+            title: 'Recording blocked in this browser',
+            body: 'Browsers only allow the mic on HTTPS or localhost. Use the FIRNAL iPhone app for recording.',
+            tips: [] as string[],
+          }
+        : {
+            title: 'Recording not available',
+            body: 'This device could not start the microphone.',
+            tips: [] as string[],
+          };
 
   return (
     <div className="flex flex-col gap-5 text-center">
       <div className="mx-auto flex size-16 items-center justify-center rounded-2xl bg-destructive/10">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="size-8 text-destructive"
-        >
-          <line x1="1" x2="23" y1="1" y2="23" />
-          <path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6" />
-          <path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23" />
-          <line x1="12" x2="12" y1="19" y2="22" />
-        </svg>
+        <MicIcon className="size-8 text-destructive" />
       </div>
 
       <div>
-        <h2 className="text-lg font-semibold">Microphone access needed</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          {isPermission
-            ? 'FIRNAL needs microphone permission to record your voice notes.'
-            : 'Recording is not supported in this browser.'}
-        </p>
+        <h2 className="text-lg font-semibold">{copy.title}</h2>
+        <p className="mt-2 text-sm text-muted-foreground">{copy.body}</p>
       </div>
 
-      {isPermission && (
+      {copy.tips.length > 0 && (
         <ul className="space-y-2.5 rounded-xl bg-muted/50 p-4 text-left text-xs text-muted-foreground">
-          <li>
-            <strong className="text-foreground">Chrome:</strong> Click the lock icon in the address
-            bar → Site settings → Allow microphone.
-          </li>
-          <li>
-            <strong className="text-foreground">Safari (iOS):</strong> Settings → Safari →
-            Microphone → Allow for this site.
-          </li>
+          {copy.tips.map((tip) => (
+            <li key={tip}>{tip}</li>
+          ))}
         </ul>
       )}
 
       <button
         type="button"
-        className="rounded-xl border border-border bg-card px-5 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
+        className="min-h-11 rounded-xl border border-border bg-card px-5 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
         onClick={onClose}
       >
         Got it

@@ -301,12 +301,15 @@
     @apply border-border outline-ring/50;
   }
   html {
-    @apply font-sans;
+    @apply font-sans bg-background;
+    background-color: #FAF9F6; /* fallback before theme vars apply — kills WebView white flash */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   body {
-    @apply bg-background text-foreground transition-colors duration-200;
+    /* No transition-colors: theme swaps shouldn't animate a full-screen flash between tabs */
+    @apply min-h-dvh bg-background text-foreground;
+    background-color: #FAF9F6;
   }
   h1, h2, h3, h4 {
     @apply font-heading tracking-tight;
@@ -337,6 +340,11 @@
   /* Warm empty state styling */
   .empty-state {
     @apply rounded-3xl border-2 border-dashed border-border/60 bg-muted/30 px-6 py-10 text-center;
+  }
+
+  /* Calm empty card — soft cream, no dashed borders */
+  .calm-empty-card {
+    @apply w-full rounded-3xl bg-card px-6 py-10 text-center shadow-sm ring-1 ring-border/40;
   }
 
   /* FAB glow effect */
@@ -412,6 +420,9 @@
   }
 }
 
+/* ========================================
+   WARMTH PULSE ANIMATIONS (PRD warmth palette)
+   ======================================== */
 @keyframes pulse-ring {
   0% {
     transform: scale(1);
@@ -453,4 +464,18 @@
 
 .animate-mic-glow {
   animation: mic-glow 1.4s ease-in-out infinite;
+}
+
+/* ========================================
+   NEXT.JS DEV OVERLAY FIX FOR CAPACITOR
+   Prevent the dev overlay portal from capturing pointer events on touch devices.
+   The portal still renders (for error display), but only its actual
+   visible content receives pointer events.
+   ======================================== */
+nextjs-portal {
+  pointer-events: none !important;
+}
+
+nextjs-portal * {
+  pointer-events: auto;
 }

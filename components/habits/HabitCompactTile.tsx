@@ -1,6 +1,6 @@
 'use client';
 
-import { Flame, Check } from 'lucide-react';
+import { Flame, Check, Mic2 } from 'lucide-react';
 import { getAllCompletions } from '@/lib/local-habits';
 import { getGoalAnalytics } from '@/lib/habit-goals';
 import {
@@ -105,10 +105,17 @@ export function HabitCompactTile({
         )}
       >
         {habit.completedToday ? (
-          <>
-            <Check className="size-3" />
-            Done
-          </>
+          habit.todaySource === 'voice' ? (
+            <>
+              <Mic2 className="size-3" />
+              Via voice
+            </>
+          ) : (
+            <>
+              <Check className="size-3" />
+              Done
+            </>
+          )
         ) : (
           'Check in'
         )}

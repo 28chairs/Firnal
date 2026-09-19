@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { BottomNav } from '@/components/navigation/BottomNav';
+import { seedThreeSampleDays, shouldAutoSeedSamples } from '@/lib/sample-data';
 import { RecordingOverlay } from '@/components/navigation/RecordingOverlay';
 import { useMediaRecorder } from '@/hooks/useMediaRecorder';
 import { uploadCapture } from '@/lib/api/uploadCapture';
@@ -62,16 +63,32 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
     setOverlayStatus('uploading');
 
-    try {
-      await uploadCapture(result.blob, result.recordedAt, result.durationMs);
+    const { error: captureError } = await uploadCapture(
+      result.blob,
+      result.recordedAt,
+      result.durationMs
+    );
+
+    notifyCapturesChanged();
+
+    if (captureError) {
+      if (captureError.category === 'offline') {
+        toast.warning('Offline — recording saved locally');
+      } else if (captureError.category === 'api_key_missing') {
+        toast.warning('API key missing — recording saved locally');
+      } else if (captureError.retryable) {
+        toast.error(captureError.message, {
+          description: 'Tap Retry in Recent Recordings',
+        });
+      } else {
+        toast.error(captureError.message);
+      }
+    } else {
       toast.success('Transcribing…');
-      notifyCapturesChanged();
-      setOverlayOpen(false);
-      setOverlayStatus('idle');
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Upload failed');
-      closeOverlay();
     }
+
+    setOverlayOpen(false);
+    setOverlayStatus('idle');
   }, [closeOverlay, stopRecording]);
 
   const beginRecording = useCallback(
@@ -147,6 +164,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [beginRecording, endRecording]);
 
   useEffect(() => {
+    if (shouldAutoSeedSamples()) {
+      seedThreeSampleDays();
+    }
+  }, []);
+
+  useEffect(() => {
     if (!overlayOpen) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
@@ -157,7 +180,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className="flex min-h-screen flex-col pb-20">{children}</div>
+      <div className="flex min-h-dvh flex-col bg-background pb-[calc(6.25rem+env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]">{children}</div>
       <BottomNav
         onFabPointerDown={handleFabPointerDown}
         onFabPointerUp={handleFabPointerUp}
