@@ -31,12 +31,18 @@ export function BottomNav({
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 border-t border-black/[0.06] bg-card/90 pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_16px_rgba(0,0,0,0.06)] backdrop-blur-xl"
+      className="fixed bottom-0 left-0 right-0 z-40 border-t border-border/50 bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-1px_20px_rgba(0,0,0,0.05)] backdrop-blur-xl transition-colors duration-200"
       aria-label="Main navigation"
     >
-      <div className="mx-auto flex h-16 max-w-lg items-end justify-between px-2">
+      <div className="mx-auto flex h-[var(--spacing-nav-height,4rem)] max-w-lg items-end justify-between px-2">
         {tabs.slice(0, 2).map(({ href, label, icon: Icon }) => (
-          <TabLink key={href} href={href} label={label} icon={Icon} active={isActive(pathname, href)} />
+          <TabLink
+            key={href}
+            href={href}
+            label={label}
+            icon={Icon}
+            active={isActive(pathname, href)}
+          />
         ))}
 
         <div className="relative -top-4 flex flex-col items-center">
@@ -72,7 +78,13 @@ export function BottomNav({
         </div>
 
         {tabs.slice(2).map(({ href, label, icon: Icon }) => (
-          <TabLink key={href} href={href} label={label} icon={Icon} active={isActive(pathname, href)} />
+          <TabLink
+            key={href}
+            href={href}
+            label={label}
+            icon={Icon}
+            active={isActive(pathname, href)}
+          />
         ))}
       </div>
     </nav>
@@ -94,11 +106,19 @@ function TabLink({
     <Link
       href={href}
       className={cn(
-        'flex min-w-[4.5rem] flex-1 flex-col items-center gap-0.5 py-2 text-xs transition-colors',
-        active ? 'text-primary font-semibold' : 'text-muted-foreground hover:text-foreground'
+        'flex min-w-[4.5rem] flex-1 flex-col items-center gap-0.5 py-2 text-xs transition-all duration-200',
+        active
+          ? 'text-primary font-semibold scale-[1.02]'
+          : 'text-muted-foreground hover:text-foreground'
       )}
     >
-      <Icon className="size-5" aria-hidden />
+      <Icon
+        className={cn(
+          'size-[var(--spacing-nav-icon,1.25rem)] transition-transform duration-200',
+          active && 'scale-105'
+        )}
+        aria-hidden
+      />
       <span>{label}</span>
     </Link>
   );
@@ -109,7 +129,7 @@ function isActive(pathname: string, href: string) {
   return pathname.startsWith(href);
 }
 
-function MicIcon() {
+function MicIcon({ className }: { className?: string }) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -119,7 +139,7 @@ function MicIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="size-7"
+      className={cn('size-7', className)}
       aria-hidden
     >
       <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { Sparkles, RefreshCw, Mic } from 'lucide-react';
 import { CategoryGrid } from '@/components/home/CategoryColumn';
 import { ConnectorLines } from '@/components/home/ConnectorLines';
 import { TranscriptPanel, type SpanRefMap } from '@/components/home/TranscriptPanel';
@@ -23,7 +24,7 @@ export function DayFlowchart({ date }: { date?: string }) {
     spanRefsRef.current.clear();
   }, [breakdown]);
   const [columnRefs, setColumnRefs] = useState<Partial<Record<CategoryKey, HTMLElement | null>>>(
-    {},
+    {}
   );
 
   const setColumnRef = (category: CategoryKey) => (el: HTMLElement | null) => {
@@ -39,36 +40,43 @@ export function DayFlowchart({ date }: { date?: string }) {
 
   if (error && !breakdown) {
     return (
-      <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-4 text-center">
-        <p className="text-sm text-destructive">{error}</p>
-        <Button variant="outline" size="sm" className="mt-3" onClick={retry}>
-          Retry breakdown
+      <div className="rounded-3xl border border-destructive/20 bg-destructive/5 p-6 text-center">
+        <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-2xl bg-destructive/10">
+          <RefreshCw className="size-6 text-destructive" />
+        </div>
+        <p className="text-sm font-medium text-destructive">{error}</p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-4"
+          onClick={retry}
+        >
+          Try again
         </Button>
       </div>
     );
   }
 
   if (!breakdown) {
-    return (
-      <div className="rounded-2xl border border-dashed border-black/[0.08] bg-card/50 px-4 py-8 text-center">
-        <p className="text-sm text-muted-foreground">
-          Record a voice note and your day will appear here as a flowchart.
-        </p>
-      </div>
-    );
+    return <EmptyFlowchart />;
   }
 
   return (
     <section className="flex flex-col gap-4">
       <header className="px-0.5">
-        <h2 className="text-lg font-semibold tracking-tight">{breakdown.title}</h2>
-        <p className="mt-1 text-[15px] leading-relaxed text-muted-foreground">
+        <h2 className="text-xl font-semibold tracking-tight text-foreground">{breakdown.title}</h2>
+        <p className="mt-1.5 text-[15px] leading-relaxed text-muted-foreground">
           {breakdown.summary}
         </p>
         {generatedAt && (
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Sparkles className="size-3" />
             Updated {formatDistanceToNow(new Date(generatedAt), { addSuffix: true })}
-            {generating ? ' · refreshing…' : ''}
+            {generating && (
+              <span className="inline-flex items-center gap-1">
+                · <RefreshCw className="size-3 animate-spin" /> refreshing
+              </span>
+            )}
           </p>
         )}
       </header>
@@ -104,7 +112,7 @@ export function DayFlowchart({ date }: { date?: string }) {
       </div>
 
       <p className="text-center text-xs text-muted-foreground">
-        You didn&apos;t tag anything — AI sorted your day into categories.
+        AI sorted your thoughts into categories automatically
       </p>
 
       {error && (
@@ -119,21 +127,46 @@ export function DayFlowchart({ date }: { date?: string }) {
   );
 }
 
+function EmptyFlowchart() {
+  return (
+    <div className="empty-state">
+      <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-primary/10">
+        <Mic className="size-8 text-primary" />
+      </div>
+      <h3 className="text-lg font-semibold text-foreground">Start your day</h3>
+      <p className="mx-auto mt-2 max-w-xs text-sm text-muted-foreground">
+        Hold the mic button and tell me about your day. AI will organize your thoughts into a visual
+        flowchart.
+      </p>
+      <div className="mx-auto mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+        <kbd className="rounded-md border border-border bg-muted px-2 py-0.5 font-mono text-[10px]">
+          Space
+        </kbd>
+        <span>or tap the mic button</span>
+      </div>
+    </div>
+  );
+}
+
 function FlowchartSkeleton() {
   return (
     <div className="flex flex-col gap-4">
-      <div className="space-y-2">
-        <Skeleton className="h-6 w-2/3" />
-        <Skeleton className="h-4 w-full" />
+      <div className="space-y-2 px-0.5">
+        <Skeleton className="h-7 w-2/3 rounded-lg" />
+        <Skeleton className="h-5 w-full rounded-lg" />
+        <Skeleton className="h-4 w-24 rounded-lg" />
       </div>
-      <Skeleton className="h-40 w-full rounded-2xl" />
+      <Skeleton className="h-44 w-full rounded-3xl" />
       <div className="grid grid-cols-2 gap-3">
-        <Skeleton className="h-24 rounded-xl" />
-        <Skeleton className="h-24 rounded-xl" />
-        <Skeleton className="h-24 rounded-xl" />
-        <Skeleton className="h-24 rounded-xl" />
+        <Skeleton className="h-28 rounded-2xl" />
+        <Skeleton className="h-28 rounded-2xl" />
+        <Skeleton className="h-28 rounded-2xl" />
+        <Skeleton className="h-28 rounded-2xl" />
       </div>
-      <p className="text-center text-xs text-muted-foreground">Building your flowchart…</p>
+      <div className="flex items-center justify-center gap-2">
+        <Sparkles className="size-4 animate-pulse text-primary" />
+        <p className="text-sm text-muted-foreground">Building your flowchart…</p>
+      </div>
     </div>
   );
 }

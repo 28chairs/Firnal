@@ -15,17 +15,17 @@ export function DayCell({ cell }: DayCellProps) {
     <>
       <span
         className={cn(
-          'text-sm font-medium tabular-nums',
-          cell.hasJournal ? 'text-foreground' : 'text-muted-foreground/70',
-          cell.isFuture && 'text-muted-foreground/40',
+          'text-sm font-medium tabular-nums transition-colors duration-200',
+          cell.hasJournal ? 'text-foreground' : 'text-muted-foreground/60',
+          cell.isFuture && 'text-muted-foreground/30'
         )}
       >
         {cell.dayNumber}
       </span>
       <span
         className={cn(
-          'mt-1 size-1.5 rounded-full',
-          cell.hasJournal ? 'bg-primary' : 'bg-transparent',
+          'mt-1 size-2 rounded-full transition-all duration-200',
+          cell.hasJournal ? 'bg-primary shadow-sm' : 'bg-transparent'
         )}
         aria-hidden
       />
@@ -36,9 +36,10 @@ export function DayCell({ cell }: DayCellProps) {
     return (
       <div
         className={cn(
-          'flex h-11 flex-col items-center justify-center rounded-xl',
-          cell.isToday && 'ring-2 ring-primary/30 ring-offset-1',
-          !cell.hasJournal && 'opacity-80',
+          'flex h-12 flex-col items-center justify-center rounded-xl transition-all duration-200',
+          cell.isToday &&
+            'bg-primary/10 ring-2 ring-primary/40 ring-offset-2 ring-offset-background',
+          !cell.hasJournal && !cell.isToday && 'opacity-70'
         )}
         aria-label={`${cell.date}${cell.hasJournal ? ', has journal' : ', no journal'}`}
       >
@@ -51,8 +52,9 @@ export function DayCell({ cell }: DayCellProps) {
     <Link
       href={`/calendar/${cell.date}`}
       className={cn(
-        'flex h-11 flex-col items-center justify-center rounded-xl transition-colors hover:bg-primary/8',
-        cell.isToday && 'ring-2 ring-primary/30 ring-offset-1',
+        'flex h-12 flex-col items-center justify-center rounded-xl transition-all duration-200 hover:bg-primary/10 hover:scale-105',
+        cell.isToday &&
+          'bg-primary/10 ring-2 ring-primary/40 ring-offset-2 ring-offset-background'
       )}
       aria-label={`Open journal for ${cell.date}`}
     >

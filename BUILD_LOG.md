@@ -501,3 +501,121 @@ Manual: record on multiple days → Calendar shows dots → tap day opens flowch
 **Run 8 — Phase 6:** Google Calendar OAuth, events strip on Home, Profile completion.
 
 ---
+
+## Run 8 — Gen Z Visual Redesign & Customizable UI System
+
+**Date:** September 16, 2026  
+**Phase:** Visual polish (cross-cutting)  
+**Goal:** Implement Gen Z–friendly visual redesign with customizable themes, fonts, and density  
+**Status:** Complete
+
+### Steps completed
+
+| Step | Task | Status |
+|------|------|--------|
+| 8.1 | Create appearance system (`lib/appearance.ts`) | Done |
+| 8.2 | Create React context for settings (`lib/appearance-context.tsx`) | Done |
+| 8.3 | Update `globals.css` with 4 theme presets | Done |
+| 8.4 | Create AppearanceSettings component | Done |
+| 8.5 | Update Profile page with Appearance section | Done |
+| 8.6 | Update RootLayout with AppearanceProvider + Nunito font | Done |
+| 8.7 | Polish visual components for Gen Z aesthetic | Done |
+| 8.8 | Add PWA viewport/theme-color metadata | Done |
+
+### What was built
+
+#### Appearance System
+- **`lib/appearance.ts`** — Theme presets, accent colors, font sizes, density, font style definitions; localStorage persistence; document class application
+- **`lib/appearance-context.tsx`** — React context with hooks for settings management; hydration-safe mounting
+- **4 Theme Presets:**
+  - **Cream Journal** — Warm paper tones (#FAF9F6) with rose/coral accents
+  - **Midnight** — Dark-first Gen Z aesthetic (#0F172A) with cool blue glow
+  - **Soft Pastel** — Muted pastels (#FDF4FF) with violet accents
+  - **Structured Blue** — Original iOS-inspired gray/blue (preserved)
+
+#### Customization Controls
+- **Theme Picker** — Visual swatches with preview colors
+- **Accent Color Picker** — 11 curated colors (Rose, Coral, Amber, Emerald, Teal, Sky, Blue, Violet, Purple, Fuchsia, Slate)
+- **Font Size** — Compact (90%), Comfortable (100%), Large (115%)
+- **Font Style** — Sans (Inter) or Soft Rounded (Nunito)
+- **Density** — Compact or Comfortable spacing
+
+#### Visual Polish
+- Updated **BottomNav** — FAB glow effect, smoother transitions
+- Updated **RecordingOverlay** — Polished modal with better states
+- Updated **CategoryCard** — Softer borders, hover effects
+- Updated **DayFlowchart** — Better empty state with mic icon + keyboard hint
+- Updated **RecentRecordings** — Status badges with icons
+- Updated **HabitReminders** — Progress indicators, voice badges
+- Updated **HabitList** — Improved empty state
+- Updated **HabitCompactTile** — Refined progress bars, hover states
+- Updated **MonthGrid / DayCell** — Calendar polish with hover animations
+- Updated **TodayHeader** — Sparkles icon, refined typography
+- Updated **SearchBar / SearchResults** — Better empty states, loading indicators
+
+#### CSS Utilities
+- `.empty-state` — Consistent empty state styling
+- `.fab-glow` — Dynamic FAB shadow using accent color
+- `.hover-lift` — Subtle lift animation
+- `.focus-ring` — Accessible focus styling
+- `.editorial-card` — Gen Z card variant
+- `prefers-reduced-motion` — Respects user motion preferences
+
+### Files created / modified (key)
+
+```
+lib/appearance.ts                    — new
+lib/appearance-context.tsx           — new
+app/globals.css                      — theme presets + utilities
+app/layout.tsx                       — AppearanceProvider + Nunito font
+app/(app)/profile/page.tsx           — Appearance section
+components/profile/AppearanceSettings.tsx — new
+components/navigation/BottomNav.tsx  — polished
+components/navigation/RecordingOverlay.tsx — polished
+components/home/DayFlowchart.tsx     — polished
+components/home/CategoryCard.tsx     — polished
+components/home/RecentRecordings.tsx — polished
+components/home/HabitReminders.tsx   — polished
+components/home/TodayHeader.tsx      — polished
+components/habits/HabitList.tsx      — polished
+components/habits/HabitCompactTile.tsx — polished
+components/calendar/MonthGrid.tsx    — polished
+components/calendar/DayCell.tsx      — polished
+components/search/SearchBar.tsx      — polished
+components/search/SearchResults.tsx  — polished
+```
+
+### How to try
+
+```bash
+npm install
+npm run dev
+# Open http://localhost:3000
+# Navigate to Profile tab → Appearance section
+# Switch themes, accent colors, font sizes
+# Changes persist across refresh
+```
+
+### Verification
+
+```bash
+npm run lint   # ✓ pass
+npm run build  # ✓ pass
+```
+
+### Design decisions
+
+1. **Cream Journal as default** — Warm, editorial feel vs. clinical iOS gray
+2. **CSS variables + class-based theming** — No runtime JS for theme colors; instant switching
+3. **Accent color override** — `--accent-override` CSS variable updates FAB + primary consistently
+4. **Density via CSS variables** — `--spacing-card`, `--spacing-nav-height` for layout flexibility
+5. **Nunito for rounded font** — Google Font with friendly, approachable character
+6. **Reduced motion respect** — All animations disabled when user prefers reduced motion
+
+### Notes
+
+- Auth and cloud sync remain deferred to Phase 9
+- All existing functionality preserved (voice recording, flowcharts, habits, search)
+- App works without Supabase keys; OpenAI key only needed for transcription
+
+---
