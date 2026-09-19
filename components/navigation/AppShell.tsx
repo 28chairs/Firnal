@@ -180,7 +180,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <div className="flex min-h-dvh flex-col pb-[calc(6.25rem+env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]">{children}</div>
+      <div className="flex min-h-dvh flex-col bg-background pb-[calc(6.25rem+env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]">{children}</div>
       <BottomNav
         onFabPointerDown={handleFabPointerDown}
         onFabPointerUp={handleFabPointerUp}
