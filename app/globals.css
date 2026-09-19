@@ -342,6 +342,11 @@
     @apply rounded-3xl border-2 border-dashed border-border/60 bg-muted/30 px-6 py-10 text-center;
   }
 
+  /* Calm empty card — soft cream, no dashed borders */
+  .calm-empty-card {
+    @apply w-full rounded-3xl bg-card px-6 py-10 text-center shadow-sm ring-1 ring-border/40;
+  }
+
   /* FAB glow effect */
   .fab-glow {
     box-shadow: 0 4px 20px color-mix(in srgb, var(--fab) 35%, transparent);
