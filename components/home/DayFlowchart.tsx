@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useDayJournal } from '@/hooks/useDayJournal';
 import { useTodayEvents } from '@/hooks/useTodayEvents';
 import { detectBrowserTimezone, getTodayDateString } from '@/lib/timezone';
+import { OFFLINE_ERROR } from '@/lib/flowchart';
 import type { CategoryKey } from '@/lib/categories';
 
 export function DayFlowchart({ date }: { date?: string }) {
@@ -48,24 +49,14 @@ export function DayFlowchart({ date }: { date?: string }) {
     setColumnRefs((prev) => (prev.questions === el ? prev : { ...prev, questions: el }));
   }, []);
 
+  const isOfflineError = error === OFFLINE_ERROR || error === 'offline';
+
   if (generating && !breakdown) {
     return <FlowchartSkeleton />;
   }
 
-  if (error && !breakdown) {
-    return (
-      <div className="empty-state">
-        <p className="text-sm text-muted-foreground">{error}</p>
-        <Button variant="ghost" size="sm" className="mt-3" onClick={retry}>
-          <RefreshCw className="mr-1.5 size-3.5" />
-          Try again
-        </Button>
-      </div>
-    );
-  }
-
   if (!breakdown) {
-    return <EmptyFlowchart />;
+    return <CalmEmptyCard isOffline={isOfflineError && !!error} />;
   }
 
   return (
@@ -150,27 +141,43 @@ export function DayFlowchart({ date }: { date?: string }) {
         </div>
       </div>
 
-      {error && (
-        <div className="flex items-center justify-center gap-2 text-sm text-destructive">
-          <span>{error}</span>
-          <Button variant="outline" size="sm" onClick={retry}>
-            Retry breakdown
+      {error && !isOfflineError && (
+        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <span>Couldn&apos;t refresh your day map</span>
+          <Button variant="ghost" size="sm" onClick={retry}>
+            Try again
           </Button>
         </div>
+      )}
+      {error && isOfflineError && (
+        <p className="text-center text-sm text-muted-foreground/70">
+          Working offline for now
+        </p>
       )}
     </section>
   );
 }
 
-function EmptyFlowchart() {
+function CalmEmptyCard({ isOffline = false }: { isOffline?: boolean }) {
   return (
-    <div className="empty-state">
-      <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/10">
-        <Mic className="size-7 text-primary" />
+    <div className="flex flex-col items-center">
+      <div className="calm-empty-card">
+        <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-primary/10">
+          <Mic className="size-8 text-primary" />
+        </div>
+        <h3 className="text-lg font-semibold tracking-tight text-foreground">
+          Hold the mic to start your day
+        </h3>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          Your voice note turns into today&apos;s map — Commitments, Decisions,
+          Ideas, People, Questions.
+        </p>
       </div>
-      <p className="text-sm text-muted-foreground">
-        Hold the mic and talk — your day becomes a timeline.
-      </p>
+      {isOffline && (
+        <p className="mt-3 text-xs text-muted-foreground/60">
+          Working offline for now
+        </p>
+      )}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import OpenAI from 'openai';
 import {
   clampSpansToTranscript,
   dailyFlowchartSchema,
@@ -10,6 +11,8 @@ import {
 } from '@/lib/prompts';
 import { getOpenAIClient } from '@/lib/openai';
 
+export const OFFLINE_ERROR = 'offline';
+
 export async function generateDailyFlowchart(
   transcripts: FlowchartTranscriptInput[],
   habitNames: string[] = [],
@@ -19,7 +22,16 @@ export async function generateDailyFlowchart(
     throw new Error('No transcripts to analyze');
   }
 
-  const openai = getOpenAIClient();
+  let openai: OpenAI;
+  try {
+    openai = getOpenAIClient();
+  } catch (err) {
+    if (err instanceof Error && err.message === OFFLINE_ERROR) {
+      throw err;
+    }
+    throw new Error(OFFLINE_ERROR);
+  }
+
   const system = buildFlowchartSystemPrompt(habitNames);
   let user = buildFlowchartUserPrompt(transcripts);
 
@@ -27,15 +39,26 @@ export async function generateDailyFlowchart(
     user += `\n\nPrevious response failed validation: ${validationError}\nFix the JSON and try again.`;
   }
 
-  const completion = await openai.chat.completions.create({
-    model: 'gpt-4o-mini',
-    response_format: { type: 'json_object' },
-    messages: [
-      { role: 'system', content: system },
-      { role: 'user', content: user },
-    ],
-    temperature: 0.3,
-  });
+  let completion;
+  try {
+    completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      response_format: { type: 'json_object' },
+      messages: [
+        { role: 'system', content: system },
+        { role: 'user', content: user },
+      ],
+      temperature: 0.3,
+    });
+  } catch (err) {
+    if (
+      err instanceof OpenAI.APIError &&
+      (err.status === 401 || err.status === 403)
+    ) {
+      throw new Error(OFFLINE_ERROR);
+    }
+    throw err;
+  }
 
   const content = completion.choices[0]?.message?.content;
   if (!content) {
