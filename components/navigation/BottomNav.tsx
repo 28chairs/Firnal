@@ -40,24 +40,35 @@ export function BottomNav({
         ))}
 
         <div className="relative -top-4 flex flex-col items-center">
-          <button
-            type="button"
-            aria-label="Hold to record (Space bar also works)"
-            disabled={disabled}
-            className={cn(
-              'flex size-16 items-center justify-center rounded-full bg-fab text-fab-foreground shadow-[0_4px_16px_rgba(101,129,162,0.45)] transition-transform touch-none select-none disabled:opacity-60',
-              isRecording && 'scale-105 ring-4 ring-fab/25'
+          <div className="relative flex items-center justify-center">
+            {isRecording && (
+              <>
+                <span className="absolute size-16 rounded-full bg-fab/50 animate-pulse-ring" />
+                <span className="absolute size-16 rounded-full bg-fab/30 animate-pulse-ring-slow" />
+              </>
             )}
-            onPointerDown={(e) => {
-              e.preventDefault();
-              onFabPointerDown();
-            }}
-            onPointerUp={onFabPointerUp}
-            onPointerLeave={onFabPointerLeave}
-            onPointerCancel={onFabPointerLeave}
-          >
-            <MicIcon />
-          </button>
+            <button
+              type="button"
+              aria-label="Hold to record (Space bar also works)"
+              disabled={disabled}
+              className={cn(
+                'relative flex size-16 items-center justify-center rounded-full bg-fab text-fab-foreground touch-none select-none disabled:opacity-60',
+                'shadow-[0_4px_20px_rgba(225,29,72,0.4)] dark:shadow-[0_4px_20px_rgba(251,113,133,0.35)]',
+                'transition-all duration-150 ease-out',
+                'active:scale-95',
+                isRecording && 'scale-110 animate-mic-glow'
+              )}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                onFabPointerDown();
+              }}
+              onPointerUp={onFabPointerUp}
+              onPointerLeave={onFabPointerLeave}
+              onPointerCancel={onFabPointerLeave}
+            >
+              <MicIcon />
+            </button>
+          </div>
         </div>
 
         {tabs.slice(2).map(({ href, label, icon: Icon }) => (
