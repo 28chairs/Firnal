@@ -619,3 +619,140 @@ npm run build  # ✓ pass
 - App works without Supabase keys; OpenAI key only needed for transcription
 
 ---
+
+## Run 9 — Sprint 1 / Phase A: Capture Reliability
+
+**Date:** September 16, 2026  
+**Phase:** A (Capture reliability — never lose a recording)  
+**Goal:** Talking into Firnal must never silently lose an entry  
+**Status:** Complete
+
+### Steps completed
+
+| Step | Task | Status |
+|------|------|--------|
+| A1.1 | Create IndexedDB audio store (`lib/local-audio-store.ts`) | Done |
+| A1.2 | Add status machine types (queued → uploading → transcribing → ready | failed) | Done |
+| A1.3 | Update `lib/local-captures.ts` with status transition helpers | Done |
+| A1.4 | Refactor `uploadCapture` to save draft BEFORE network call | Done |
+| A1.5 | Update `AppShell` to handle new upload flow | Done |
+| A2.1 | Add Retry button to `RecentRecordings` for failed captures | Done |
+| A2.2 | Human-readable error categorization (network/offline/api-key/openai) | Done |
+| A2.3 | Auto-retry once on transient network failure | Done |
+| A3.1 | Offline detection before upload | Done |
+| A3.2 | Missing API key detection and graceful handling | Done |
+| A3.3 | Clear inline states for offline/missing-key scenarios | Done |
+
+### What was built
+
+#### A1 — Local Draft BEFORE Network
+
+- **`lib/local-audio-store.ts`** — IndexedDB-based audio blob store (localStorage is too small for audio)
+  - `saveAudioDraft(draft)` — Persist audio blob with metadata
+  - `getAudioDraft(id)` — Retrieve stored audio for retry
+  - `deleteAudioDraft(id)` — Clean up after successful transcription
+  - `hasAudioDraft(id)` — Check if audio exists
+
+- **Status Machine** — Extended `VoiceEntry` with:
+  - `queued` — Saved locally, waiting to upload
+  - `uploading` — Network request in progress
+  - `transcribing` — Server processing (existing)
+  - `transcribed` — Success (existing, aliased as "ready")
+  - `failed` — Error occurred, audio retained for retry
+
+- **`lib/local-captures.ts`** — New status transition helpers:
+  - `createDraftCapture()` — Create entry with `queued` status
+  - `setUploadingStatus()`, `setTranscribingStatus()`, `setTranscribedStatus()`, `setFailedStatus()`
+  - `setQueuedForRetry()` — Reset failed capture for retry
+  - `getFailedCaptures()`, `getQueuedCaptures()`, `getPendingCaptures()`
+
+- **`lib/api/uploadCapture.ts`** — Complete rewrite:
+  - `saveDraftCapture()` — Save to IndexedDB + localStorage BEFORE any network
+  - `processCapture()` — Handle upload with proper status transitions
+  - `retryCapture()` — Re-process failed capture using stored audio
+  - Auto-retry once on transient network errors
+
+#### A2 — Retry + Failure UX
+
+- **Error Categorization** — `ErrorCategory` type with human-readable messages:
+  - `offline` — "You're offline. Recording saved — will upload when you're back online."
+  - `api_key_missing` — "OpenAI API key not configured. Recording saved locally."
+  - `network` — "Network error. Recording saved — tap Retry when connected."
+  - `openai_error` — "Transcription failed. Recording saved — tap Retry."
+
+- **`RecentRecordings.tsx`** — Enhanced UI:
+  - Retry button for failed/queued captures
+  - Category-specific icons (WifiOff, KeyRound, AlertCircle)
+  - Contextual help text ("Connect to the internet and tap Retry")
+  - Status badges for new states (queued, uploading)
+  - Disabled retry when offline
+
+- **Auto-retry** — One automatic retry on network failures before marking as failed
+
+#### A3 — Offline / Missing-Key Honesty
+
+- **Offline Detection** — `navigator.onLine` check before and during upload
+- **API Key Detection** — Server returns 503 with clear message if `OPENAI_API_KEY` missing
+- **Toast Messages** — Context-aware toasts:
+  - `toast.warning('Offline — recording saved locally')`
+  - `toast.warning('API key missing — recording saved locally')`
+  - `toast.error()` with "Tap Retry in Recent Recordings" description
+
+### Files created / modified
+
+```
+lib/local-audio-store.ts              — new (IndexedDB audio blob store)
+lib/types/voice.ts                    — expanded EntryStatus + ErrorCategory
+lib/local-captures.ts                 — status transition helpers
+lib/api/uploadCapture.ts              — draft-first upload flow
+components/navigation/AppShell.tsx    — new upload handling
+components/home/RecentRecordings.tsx  — Retry UI + error states
+app/api/transcribe/route.ts           — API key error handling
+```
+
+### How to test
+
+```bash
+npm install
+npm run dev
+# Open http://localhost:3000
+```
+
+**Test 1: Kill network mid-upload**
+1. Open DevTools → Network → Throttle to Offline
+2. Hold FAB, speak, release
+3. Verify capture shows "Saved locally" badge + error panel
+4. Go back online, tap Retry → transcript succeeds
+
+**Test 2: Missing OpenAI key**
+1. Remove or comment out `OPENAI_API_KEY` in `.env.local`
+2. Restart server
+3. Hold FAB, speak, release
+4. Verify capture shows "API key not configured" error
+5. Audio retained for retry after adding key
+
+**Test 3: Offline detection**
+1. DevTools → Network → Offline before recording
+2. Hold FAB → see "offline" error immediately
+3. Recording still saved locally for later
+
+**Test 4: App still works without auth**
+1. Visit `/` → Home loads without redirect
+2. All tabs accessible
+3. No Supabase errors in console
+
+### Verification
+
+```bash
+npm run lint   # ✓ pass
+npm run build  # ✓ pass
+```
+
+### Acceptance Criteria
+
+- [x] Kill network mid-upload → capture still listed as failed/queued with audio retained
+- [x] Retry after network returns → transcript succeeds without re-recording
+- [x] Missing OpenAI key → capture kept + honest error (no silent vanish)
+- [x] App still opens without auth/Supabase
+
+---

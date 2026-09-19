@@ -62,16 +62,32 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
     setOverlayStatus('uploading');
 
-    try {
-      await uploadCapture(result.blob, result.recordedAt, result.durationMs);
+    const { error: captureError } = await uploadCapture(
+      result.blob,
+      result.recordedAt,
+      result.durationMs
+    );
+
+    notifyCapturesChanged();
+
+    if (captureError) {
+      if (captureError.category === 'offline') {
+        toast.warning('Offline — recording saved locally');
+      } else if (captureError.category === 'api_key_missing') {
+        toast.warning('API key missing — recording saved locally');
+      } else if (captureError.retryable) {
+        toast.error(captureError.message, {
+          description: 'Tap Retry in Recent Recordings',
+        });
+      } else {
+        toast.error(captureError.message);
+      }
+    } else {
       toast.success('Transcribing…');
-      notifyCapturesChanged();
-      setOverlayOpen(false);
-      setOverlayStatus('idle');
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Upload failed');
-      closeOverlay();
     }
+
+    setOverlayOpen(false);
+    setOverlayStatus('idle');
   }, [closeOverlay, stopRecording]);
 
   const beginRecording = useCallback(
