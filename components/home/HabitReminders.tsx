@@ -18,52 +18,32 @@ export function HabitReminders() {
     return a.completedToday ? 1 : -1;
   });
 
-  const completedCount = habits.filter((h) => h.completedToday).length;
-  const totalCount = habits.length;
-
   return (
-    <section className="flex flex-col gap-3">
-      <div className="flex items-center justify-between px-0.5">
-        <h2 className="text-sm font-medium text-muted-foreground">Habits</h2>
-        <span className="text-xs text-muted-foreground/80">
-          {completedCount}/{totalCount}
-        </span>
-      </div>
-      <div className="-mx-1 flex gap-2.5 overflow-x-auto px-1 pb-1.5">
-        {sorted.map((habit) => (
-          <button
-            key={habit.id}
-            type="button"
-            onClick={() => toggle(habit.id)}
-            className={cn(
-              'group inline-flex shrink-0 items-center gap-2 rounded-2xl border-2 px-4 py-2.5 text-sm transition-all duration-200',
-              habit.completedToday
-                ? 'border-decisions/40 bg-decisions/10 text-foreground shadow-sm'
-                : 'border-border/60 bg-card text-foreground hover:border-primary/40 hover:bg-primary/5'
-            )}
-          >
-            <span
-              className="text-lg transition-transform duration-200 group-hover:scale-110"
-              aria-hidden
-            >
-              {habit.emoji}
-            </span>
-            <span className="font-medium">{habit.name}</span>
-            {habit.completedToday && (
-              <span className="flex items-center gap-1 text-xs">
-                {habit.todaySource === 'voice' ? (
-                  <span className="flex items-center gap-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-primary">
-                    <Mic2 className="size-3" />
-                    <span className="text-[10px] font-medium">voice</span>
-                  </span>
-                ) : (
-                  <CheckCircle2 className="size-3 text-decisions" />
-                )}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
-    </section>
+    <div className="-mx-1 flex flex-wrap items-center gap-1.5 px-1">
+      <span className="mr-1 text-xs font-medium text-muted-foreground">Habits</span>
+      {sorted.map((habit) => (
+        <button
+          key={habit.id}
+          type="button"
+          onClick={() => toggle(habit.id)}
+          className={cn(
+            'inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-xs transition-colors',
+            habit.completedToday
+              ? 'border-decisions/30 bg-decisions/10 text-foreground'
+              : 'border-border/60 bg-card text-foreground hover:bg-muted',
+          )}
+        >
+          <span aria-hidden className="text-sm">{habit.emoji}</span>
+          <span>{habit.name}</span>
+          {habit.completedToday && (
+            habit.todaySource === 'voice' ? (
+              <Mic2 className="size-3 text-primary" />
+            ) : (
+              <CheckCircle2 className="size-3 text-decisions" />
+            )
+          )}
+        </button>
+      ))}
+    </div>
   );
 }
