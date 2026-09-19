@@ -57,7 +57,7 @@ export function RecordingOverlay({
                 <span className="absolute size-32 rounded-full border-4 border-fab/20 border-t-fab animate-spin" />
               )}
               <div
-                className={`relative flex size-28 items-center justify-center rounded-full bg-fab text-fab-foreground shadow-[0_8px_32px_rgba(225,29,72,0.35)] dark:shadow-[0_8px_32px_rgba(251,113,133,0.3)] transition-transform duration-200 ${
+                className={`relative flex size-28 items-center justify-center rounded-full bg-fab text-fab-foreground shadow-[0_8px_32px_rgba(196,91,108,0.35)] dark:shadow-[0_8px_32px_rgba(212,132,144,0.3)] transition-transform duration-200 ${
                   isRecording ? 'scale-105 animate-mic-glow' : ''
                 } ${isUploading ? 'opacity-80' : ''}`}
               >

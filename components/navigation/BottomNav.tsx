@@ -53,7 +53,7 @@ export function BottomNav({
               disabled={disabled}
               className={cn(
                 'relative flex size-16 items-center justify-center rounded-full bg-fab text-fab-foreground touch-none select-none disabled:opacity-60',
-                'shadow-[0_4px_20px_rgba(225,29,72,0.4)] dark:shadow-[0_4px_20px_rgba(251,113,133,0.35)]',
+                'shadow-[0_4px_20px_rgba(196,91,108,0.4)] dark:shadow-[0_4px_20px_rgba(212,132,144,0.35)]',
                 'transition-all duration-150 ease-out',
                 'active:scale-95',
                 isRecording && 'scale-110 animate-mic-glow'
