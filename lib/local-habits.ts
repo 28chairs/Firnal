@@ -4,6 +4,7 @@ import type {
   HabitCompletion,
   HabitWithTodayStatus,
 } from '@/lib/types/habits';
+import { createId } from '@/lib/id';
 
 const HABITS_KEY = 'firnal:habits';
 const COMPLETIONS_KEY = 'firnal:habit-completions';
@@ -119,7 +120,7 @@ export function createHabit(
   goalStartDate: string,
 ): Habit {
   const habit: Habit = {
-    id: crypto.randomUUID(),
+    id: createId(),
     name: name.trim(),
     emoji: emoji.trim() || '✓',
     isActive: true,
