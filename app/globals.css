@@ -301,12 +301,15 @@
     @apply border-border outline-ring/50;
   }
   html {
-    @apply font-sans;
+    @apply font-sans bg-background;
+    background-color: #FAF9F6; /* fallback before theme vars apply — kills WebView white flash */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   body {
-    @apply bg-background text-foreground transition-colors duration-200;
+    /* No transition-colors: theme swaps shouldn't animate a full-screen flash between tabs */
+    @apply min-h-dvh bg-background text-foreground;
+    background-color: #FAF9F6;
   }
   h1, h2, h3, h4 {
     @apply font-heading tracking-tight;

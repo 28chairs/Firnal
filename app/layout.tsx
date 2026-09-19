@@ -46,7 +46,20 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       className={`${inter.variable} ${nunito.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col text-base">
+      <head>
+        <style
+          dangerouslySetInnerHTML={{
+            __html: 'html,body{background-color:#FAF9F6}',
+          }}
+        />
+        <script
+          id="firnal-appearance-boot"
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var raw=localStorage.getItem('firnal:appearance');if(!raw)return;var s=JSON.parse(raw);var html=document.documentElement;var theme=s.theme||'cream-journal';html.classList.add('theme-'+theme);if(theme==='midnight')html.classList.add('dark');if(s.accentColor)html.style.setProperty('--accent-override',s.accentColor);var bg={ 'cream-journal':'#FAF9F6', midnight:'#0F172A', 'soft-pastel':'#FDF4FF', 'structured-blue':'#F2F2F7' }[theme];if(bg){html.style.backgroundColor=bg;document.documentElement.style.setProperty('--boot-bg',bg)}}catch(e){}})();`,
+          }}
+        />
+      </head>
+      <body className="min-h-full flex flex-col bg-background text-base">
         <AppearanceProvider>
           {children}
           <Toaster />
