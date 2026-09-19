@@ -415,6 +415,9 @@
   }
 }
 
+/* ========================================
+   WARMTH PULSE ANIMATIONS (PRD warmth palette)
+   ======================================== */
 @keyframes pulse-ring {
   0% {
     transform: scale(1);
@@ -456,4 +459,18 @@
 
 .animate-mic-glow {
   animation: mic-glow 1.4s ease-in-out infinite;
+}
+
+/* ========================================
+   NEXT.JS DEV OVERLAY FIX FOR CAPACITOR
+   Prevent the dev overlay portal from capturing pointer events on touch devices.
+   The portal still renders (for error display), but only its actual
+   visible content receives pointer events.
+   ======================================== */
+nextjs-portal {
+  pointer-events: none !important;
+}
+
+nextjs-portal * {
+  pointer-events: auto;
 }
