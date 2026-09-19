@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Nunito } from 'next/font/google';
 import { Toaster } from '@/components/ui/sonner';
 import { AppearanceProvider } from '@/lib/appearance-context';
+import { cryptoPolyfillScript } from '@/lib/crypto-polyfill';
 import './globals.css';
 
 const inter = Inter({
@@ -47,6 +48,10 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       suppressHydrationWarning
     >
       <head>
+        <script
+          id="firnal-crypto-polyfill"
+          dangerouslySetInnerHTML={{ __html: cryptoPolyfillScript }}
+        />
         <style
           dangerouslySetInnerHTML={{
             __html: 'html,body{background-color:#FAF9F6}',
