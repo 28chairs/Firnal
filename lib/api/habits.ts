@@ -8,6 +8,7 @@ import {
   toggleHabitForDate,
   updateHabit,
 } from '@/lib/local-habits';
+import { hasAIAccess } from '@/lib/billing/entitlements';
 import { detectBrowserTimezone, getTodayDateString } from '@/lib/timezone';
 import type { HabitWithTodayStatus } from '@/lib/types/habits';
 
@@ -37,6 +38,10 @@ export function toggleHabitToday(habitId: string) {
 export async function detectAndApplyHabits(voiceEntryId: string, transcript: string) {
   const habits = getTodayHabits();
   if (habits.length === 0 || !transcript.trim()) return;
+
+  if (!hasAIAccess()) {
+    return;
+  }
 
   const response = await fetch('/api/habits/detect', {
     method: 'POST',

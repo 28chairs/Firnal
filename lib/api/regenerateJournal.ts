@@ -3,6 +3,7 @@
 import type { DailyFlowchart } from '@/lib/schemas';
 import { getActiveHabitNames } from '@/lib/local-habits';
 import { getLocalJournal, notifyJournalChanged, saveLocalJournal } from '@/lib/local-journal';
+import { consumeAIQuota, hasAIAccess } from '@/lib/billing/entitlements';
 
 export type RegenerateJournalResponse = {
   date: string;
@@ -10,10 +11,21 @@ export type RegenerateJournalResponse = {
   generatedAt: string;
 };
 
+export class AIQuotaExhaustedError extends Error {
+  constructor() {
+    super('Weekly AI quota exhausted. Upgrade to Plus for unlimited AI features.');
+    this.name = 'AIQuotaExhaustedError';
+  }
+}
+
 export async function regenerateJournal(
   date: string,
   transcripts: { recordedAt: string; transcript: string }[],
 ): Promise<RegenerateJournalResponse> {
+  if (!hasAIAccess()) {
+    throw new AIQuotaExhaustedError();
+  }
+
   const response = await fetch(`/api/journal/${date}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -28,6 +40,8 @@ export async function regenerateJournal(
   if (!response.ok) {
     throw new Error(payload.error ?? 'Failed to generate flowchart');
   }
+
+  consumeAIQuota();
 
   const result = payload as RegenerateJournalResponse;
   saveLocalJournal(date, {
