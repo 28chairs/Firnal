@@ -95,10 +95,12 @@ function TabLink({
   return (
     <Link
       href={href}
+      prefetch
+      scroll={false}
       className={cn(
-        'flex min-w-[4.5rem] flex-1 flex-col items-center gap-0.5 py-2 text-xs transition-all duration-200',
+        'flex min-w-[4.5rem] flex-1 flex-col items-center gap-0.5 py-2 text-xs transition-colors duration-150',
         active
-          ? 'text-primary font-semibold scale-[1.02]'
+          ? 'text-primary font-semibold'
           : 'text-muted-foreground hover:text-foreground'
       )}
     >
