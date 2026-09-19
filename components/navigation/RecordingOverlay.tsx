@@ -19,9 +19,12 @@ export function RecordingOverlay({
 }: RecordingOverlayProps) {
   if (!isOpen) return null;
 
+  const isRecording = status === 'recording';
+  const isUploading = status === 'uploading';
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-label="Recording"
@@ -30,30 +33,57 @@ export function RecordingOverlay({
         type="button"
         className="absolute inset-0 cursor-default"
         aria-label="Close recording overlay"
-        onClick={status === 'uploading' ? undefined : onClose}
-        disabled={status === 'uploading'}
+        onClick={isUploading ? undefined : onClose}
+        disabled={isUploading}
       />
 
-      <div className="relative z-10 flex max-w-sm flex-col items-center gap-6 rounded-2xl bg-card px-8 py-10 shadow-xl">
+      <div className="relative z-10 flex w-full max-w-xs flex-col items-center gap-8 rounded-3xl bg-card/95 px-8 py-12 shadow-2xl backdrop-blur-md">
         {micError ? (
           <MicErrorPanel error={micError} onClose={onClose} />
         ) : (
           <>
-            <div
-              className={`flex size-24 items-center justify-center rounded-full bg-fab text-fab-foreground ${
-                status === 'recording' ? 'animate-pulse ring-4 ring-fab/30' : ''
-              }`}
-            >
-              <MicIcon />
+            <div className="relative flex items-center justify-center">
+              {isRecording && (
+                <>
+                  <span className="absolute size-28 rounded-full bg-fab/40 animate-pulse-ring" />
+                  <span className="absolute size-28 rounded-full bg-fab/25 animate-pulse-ring-slow" />
+                  <span
+                    className="absolute size-28 rounded-full bg-fab/15 animate-pulse-ring"
+                    style={{ animationDelay: '0.5s' }}
+                  />
+                </>
+              )}
+              {isUploading && (
+                <span className="absolute size-32 rounded-full border-4 border-fab/20 border-t-fab animate-spin" />
+              )}
+              <div
+                className={`relative flex size-28 items-center justify-center rounded-full bg-fab text-fab-foreground shadow-[0_8px_32px_rgba(196,91,108,0.35)] dark:shadow-[0_8px_32px_rgba(212,132,144,0.3)] transition-transform duration-200 ${
+                  isRecording ? 'scale-105 animate-mic-glow' : ''
+                } ${isUploading ? 'opacity-80' : ''}`}
+              >
+                <MicIcon />
+              </div>
             </div>
-            <p className="font-mono text-3xl tabular-nums text-foreground">{elapsedLabel}</p>
-            <p className="text-center text-sm text-muted-foreground">
-              {status === 'uploading'
-                ? 'Uploading and transcribing…'
-                : status === 'recording'
-                  ? 'Release Space or the mic to stop'
-                  : 'Hold Space or the mic to record'}
-            </p>
+
+            <div className="flex flex-col items-center gap-2">
+              <p className="font-mono text-4xl font-medium tabular-nums tracking-tight text-foreground">
+                {elapsedLabel}
+              </p>
+              <p className="text-center text-sm font-medium text-muted-foreground">
+                {isUploading
+                  ? 'Processing your note…'
+                  : isRecording
+                    ? 'Release to stop'
+                    : 'Hold to record'}
+              </p>
+            </div>
+
+            {isUploading && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <span className="size-1.5 rounded-full bg-fab animate-pulse" />
+                <span>Uploading and transcribing</span>
+              </div>
+            )}
           </>
         )}
       </div>

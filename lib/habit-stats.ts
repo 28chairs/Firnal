@@ -112,12 +112,12 @@ export function getMonthGridPadding(today: string, timezone: string): number {
 }
 
 export const HABIT_ACCENT_COLORS = [
-  '#6581A2',
-  '#69A859',
-  '#F49F99',
-  '#2C5073',
-  '#C43A37',
-  '#BDBD68',
+  '#C45B6C',
+  '#9BB87A',
+  '#D9A0A8',
+  '#7D736C',
+  '#E8A07A',
+  '#7A93B0',
 ] as const;
 
 export function getHabitAccentColor(habitId: string, index: number): string {
