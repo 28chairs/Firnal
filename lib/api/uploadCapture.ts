@@ -18,6 +18,7 @@ import {
   getAudioDraft,
 } from '@/lib/local-audio-store';
 import { notifyCapturesChanged } from '@/lib/recording';
+import { createId } from '@/lib/id';
 
 const MAX_BYTES = 25 * 1024 * 1024;
 const MAX_AUTO_RETRIES = 1;
@@ -98,7 +99,7 @@ export async function saveDraftCapture(
   recordedAt: string,
   durationMs: number
 ): Promise<string> {
-  const id = crypto.randomUUID();
+  const id = createId();
 
   await saveAudioDraft({
     id,
