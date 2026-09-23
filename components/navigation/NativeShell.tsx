@@ -11,6 +11,7 @@ export function NativeShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
+    let slowTimer: number | undefined;
 
     async function setup() {
       if (!Capacitor.isNativePlatform()) return;
@@ -30,7 +31,7 @@ export function NativeShell({ children }: { children: React.ReactNode }) {
 
     void setup();
 
-    const slowTimer = window.setTimeout(() => {
+    slowTimer = window.setTimeout(() => {
       if (!cancelled) setBootSlow(true);
     }, 2500);
 
@@ -39,7 +40,13 @@ export function NativeShell({ children }: { children: React.ReactNode }) {
         const res = await fetch('/', { method: 'HEAD', cache: 'no-store' });
         if (!cancelled) {
           setOffline(!res.ok);
-          if (res.ok) setBootSlow(false);
+          if (res.ok) {
+            if (slowTimer !== undefined) {
+              window.clearTimeout(slowTimer);
+              slowTimer = undefined;
+            }
+            setBootSlow(false);
+          }
         }
       } catch {
         if (!cancelled) setOffline(true);
@@ -57,7 +64,9 @@ export function NativeShell({ children }: { children: React.ReactNode }) {
 
     return () => {
       cancelled = true;
-      window.clearTimeout(slowTimer);
+      if (slowTimer !== undefined) {
+        window.clearTimeout(slowTimer);
+      }
       window.removeEventListener('online', onOnline);
       window.removeEventListener('offline', onOffline);
     };
