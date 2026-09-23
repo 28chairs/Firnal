@@ -9,10 +9,10 @@ import { UpgradeSheet } from './UpgradeSheet';
 import {
   BILLING_CHANGED_EVENT,
   getBillingState,
+  getBillingServerSnapshot,
   getWeeklyQuotaState,
+  getWeeklyQuotaServerSnapshot,
   upgradeToPlan,
-  type BillingState,
-  type WeeklyQuotaState,
 } from '@/lib/billing/entitlements';
 import { FREE_AI_MAPS_PER_WEEK, PLANS, type PlanType } from '@/lib/billing/plans';
 
@@ -28,22 +28,6 @@ function subscribeBilling(onStoreChange: () => void) {
   return () => window.removeEventListener(BILLING_CHANGED_EVENT, onStoreChange);
 }
 
-function getClientBillingSnapshot(): BillingState {
-  return getBillingState();
-}
-
-function getServerBillingSnapshot(): BillingState {
-  return { plan: 'free', email: null, stripeCustomerId: null, updatedAt: null };
-}
-
-function getClientQuotaSnapshot(): WeeklyQuotaState {
-  return getWeeklyQuotaState();
-}
-
-function getServerQuotaSnapshot(): WeeklyQuotaState {
-  return { weekStart: '', used: 0 };
-}
-
 export function BillingStatus() {
   const searchParams = useSearchParams();
   const [verifying, setVerifying] = useState(false);
@@ -53,14 +37,14 @@ export function BillingStatus() {
 
   const billing = useSyncExternalStore(
     subscribeBilling,
-    getClientBillingSnapshot,
-    getServerBillingSnapshot
+    getBillingState,
+    getBillingServerSnapshot
   );
 
   const quota = useSyncExternalStore(
     subscribeBilling,
-    getClientQuotaSnapshot,
-    getServerQuotaSnapshot
+    getWeeklyQuotaState,
+    getWeeklyQuotaServerSnapshot
   );
 
   useEffect(() => {

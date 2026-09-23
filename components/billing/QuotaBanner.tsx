@@ -5,29 +5,48 @@ import { Sparkles } from 'lucide-react';
 import {
   BILLING_CHANGED_EVENT,
   getBillingState,
+  getBillingServerSnapshot,
   getFreeQuotaRemaining,
   type BillingState,
 } from '@/lib/billing/entitlements';
 import { isPaidPlan, FREE_AI_MAPS_PER_WEEK } from '@/lib/billing/plans';
 import { UpgradeSheet } from './UpgradeSheet';
 
+interface QuotaSnapshot {
+  billing: BillingState;
+  quotaRemaining: number;
+}
+
+let clientSnapshot: QuotaSnapshot | null = null;
+
+const serverSnapshot: QuotaSnapshot = {
+  billing: getBillingServerSnapshot(),
+  quotaRemaining: FREE_AI_MAPS_PER_WEEK,
+};
+
+function snapshotSignature(s: QuotaSnapshot): string {
+  return `${s.billing.plan}|${s.billing.updatedAt ?? ''}|${s.quotaRemaining}`;
+}
+
 function subscribeBilling(onStoreChange: () => void) {
   window.addEventListener(BILLING_CHANGED_EVENT, onStoreChange);
   return () => window.removeEventListener(BILLING_CHANGED_EVENT, onStoreChange);
 }
 
-function getClientSnapshot(): { billing: BillingState; quotaRemaining: number } {
-  return {
+function getClientSnapshot(): QuotaSnapshot {
+  const next: QuotaSnapshot = {
     billing: getBillingState(),
     quotaRemaining: getFreeQuotaRemaining(),
   };
+  if (clientSnapshot && snapshotSignature(clientSnapshot) === snapshotSignature(next)) {
+    return clientSnapshot;
+  }
+  clientSnapshot = next;
+  return clientSnapshot;
 }
 
-function getServerSnapshot(): { billing: BillingState; quotaRemaining: number } {
-  return {
-    billing: { plan: 'free', email: null, stripeCustomerId: null, updatedAt: null },
-    quotaRemaining: FREE_AI_MAPS_PER_WEEK,
-  };
+function getServerSnapshot(): QuotaSnapshot {
+  return serverSnapshot;
 }
 
 export function QuotaBanner() {

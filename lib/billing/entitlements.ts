@@ -30,11 +30,35 @@ export interface MonthlyQuotaState {
   used: number;
 }
 
+const DEFAULT_BILLING: BillingState = {
+  plan: 'free',
+  email: null,
+  stripeCustomerId: null,
+  updatedAt: null,
+};
+
+let billingSnapshot: BillingState = DEFAULT_BILLING;
+let weeklyQuotaSnapshot: WeeklyQuotaState = { weekStart: '', used: 0 };
+let monthlyQuotaSnapshot: MonthlyQuotaState = { monthStart: '', used: 0 };
+
+function billingSignature(state: BillingState): string {
+  return `${state.plan}|${state.email ?? ''}|${state.stripeCustomerId ?? ''}|${state.updatedAt ?? ''}`;
+}
+
+function weeklySignature(state: WeeklyQuotaState): string {
+  return `${state.weekStart}|${state.used}`;
+}
+
+function monthlySignature(state: MonthlyQuotaState): string {
+  return `${state.monthStart}|${state.used}`;
+}
+
 function getWeekStart(): string {
   const now = new Date();
   const day = now.getDay();
   const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-  const monday = new Date(now.setDate(diff));
+  const monday = new Date(now);
+  monday.setDate(diff);
   return monday.toISOString().split('T')[0];
 }
 
@@ -121,20 +145,46 @@ function writeMonthlyQuotaState(state: MonthlyQuotaState): void {
   window.dispatchEvent(new Event(BILLING_CHANGED_EVENT));
 }
 
+/** Cached snapshot for useSyncExternalStore — same reference until data changes. */
 export function getBillingState(): BillingState {
-  return readBillingState();
+  const next = readBillingState();
+  if (billingSignature(billingSnapshot) === billingSignature(next)) {
+    return billingSnapshot;
+  }
+  billingSnapshot = next;
+  return billingSnapshot;
+}
+
+export function getBillingServerSnapshot(): BillingState {
+  return DEFAULT_BILLING;
 }
 
 export function getCurrentPlan(): PlanType {
-  return readBillingState().plan;
+  return getBillingState().plan;
 }
 
+/** Cached snapshot for useSyncExternalStore — same reference until data changes. */
 export function getWeeklyQuotaState(): WeeklyQuotaState {
-  return readWeeklyQuotaState();
+  const next = readWeeklyQuotaState();
+  if (weeklySignature(weeklyQuotaSnapshot) === weeklySignature(next)) {
+    return weeklyQuotaSnapshot;
+  }
+  weeklyQuotaSnapshot = next;
+  return weeklyQuotaSnapshot;
 }
 
+export function getWeeklyQuotaServerSnapshot(): WeeklyQuotaState {
+  return { weekStart: '', used: 0 };
+}
+
+/** Cached snapshot for useSyncExternalStore — same reference until data changes. */
 export function getMonthlyQuotaState(): MonthlyQuotaState {
-  return readMonthlyQuotaState();
+  const next = readMonthlyQuotaState();
+  if (monthlySignature(monthlyQuotaSnapshot) === monthlySignature(next)) {
+    return monthlyQuotaSnapshot;
+  }
+  monthlyQuotaSnapshot = next;
+  return monthlyQuotaSnapshot;
 }
 
 export function getFreeQuotaRemaining(): number {
